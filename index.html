@@ -16,21 +16,41 @@
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             color: #fff;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
+        .app-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 90vh;
+        }
+        
+        /* Sol Sidebar - Chat */
+        .sidebar {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Ana İçerik - CoinFlip */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
         .container {
-            width: 100%;
-            max-width: 450px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
         .logo {
@@ -103,7 +123,6 @@
         }
         
         .btn {
-            width: 100%;
             padding: 12px;
             background: linear-gradient(90deg, #ff8a00, #e52e71);
             border: none;
@@ -184,9 +203,8 @@
         
         /* CoinFlip Sayfası Stilleri */
         .coinflip-container {
-            width: 100%;
-            max-width: 800px;
             display: none;
+            height: 100%;
         }
         
         .coinflip-header {
@@ -231,9 +249,12 @@
         
         .matches-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
         }
         
         .match-card {
@@ -348,7 +369,7 @@
         }
         
         .create-match {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
         }
         
@@ -396,7 +417,9 @@
         
         /* Chat Sistemi */
         .chat-container {
-            margin-top: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             overflow: hidden;
@@ -406,12 +429,15 @@
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
             font-weight: 600;
+            text-align: center;
         }
         
         .chat-messages {
-            height: 200px;
+            flex: 1;
             overflow-y: auto;
             padding: 15px;
+            display: flex;
+            flex-direction: column;
         }
         
         .chat-message {
@@ -419,6 +445,8 @@
             padding: 8px 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
+            max-width: 100%;
+            word-wrap: break-word;
         }
         
         .chat-message .sender {
@@ -431,6 +459,7 @@
             display: flex;
             padding: 15px;
             background: rgba(255, 255, 255, 0.1);
+            gap: 10px;
         }
         
         .chat-input input {
@@ -443,13 +472,13 @@
         }
         
         .chat-input button {
-            margin-left: 10px;
             padding: 10px 15px;
             background: #4CAF50;
             border: none;
             border-radius: 5px;
             color: white;
             cursor: pointer;
+            white-space: nowrap;
         }
         
         /* CoinFlip Animasyonu */
@@ -535,6 +564,7 @@
             text-align: center;
             padding: 30px;
             color: #aaa;
+            grid-column: 1 / -1;
         }
         
         /* Envanter Modal */
@@ -859,7 +889,7 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
         }
         
@@ -880,6 +910,7 @@
         .tip-buttons {
             display: flex;
             gap: 10px;
+            margin-top: 20px;
         }
         
         .tip-buttons button {
@@ -899,11 +930,53 @@
         .tip-cancel {
             background: #f44336;
         }
+        
+        .all-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .quick-tip-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quick-tip-item:hover {
+            transform: translateY(-2px);
+            border-color: #ff8a00;
+        }
+        
+        .quick-tip-item.selected {
+            border-color: #4CAF50;
+        }
+        
+        .quick-tip-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .tip-instruction {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <!-- Giriş Sayfası -->
-    <div class="container" id="loginContainer">
+    <div class="container" id="loginContainer" style="max-width: 450px; margin: 50px auto;">
         <div class="logo">
             <h1>Dedok Bet</h1>
             <p>Giriş yaparak, en az 18 yaşında olduğunuzu, bahis yaptığınız öğelerin çalıntı olmadığını ve Kullanım Şartlarımızı kabul ettiğinizi onaylamış olursunuz.</p>
@@ -941,55 +1014,65 @@
         </div>
     </div>
 
-    <!-- CoinFlip Sayfası -->
-    <div class="container coinflip-container" id="coinflipContainer">
-        <div class="coinflip-header">
-            <h1>Dedok Bet - CoinFlip</h1>
-            <p>Risk al, kazançları topla! %50 şans ile paranı ikiye katla.</p>
-        </div>
-        
-        <div class="user-info">
-            <div class="user-welcome">Hoş geldin, <strong id="coinflipUsername"></strong>!</div>
-            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
-        </div>
-        
-        <div class="top-buttons">
-            <button class="top-btn" id="walletBtn">💰 Wallet</button>
-        </div>
-        
-        <div class="balance-card">
-            <div>
-                <h3>Toplam Value</h3>
-                <div class="balance-amount" id="userBalance">0 Value</div>
-            </div>
-        </div>
-        
-        <h2 style="margin-bottom: 15px;">Aktif Maçlar</h2>
-        <div class="matches-container" id="matchesContainer">
-            <div class="no-matches" id="noMatchesMessage">
-                Henüz aktif maç bulunmuyor. İlk maçı siz oluşturun!
-            </div>
-        </div>
-        
-        <div class="create-match">
-            <button class="create-btn" id="createMatchBtn">Yeni Maç Oluştur</button>
-        </div>
-        
-        <!-- Chat Sistemi -->
-        <div class="chat-container">
-            <div class="chat-header">Genel Sohbet</div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-message">
-                    <span class="sender">Sistem:</span> Sohbete hoş geldiniz! /tip [kullanıcı] [item] komutu ile item gönderebilirsiniz.
+    <!-- Ana Uygulama -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <!-- Sol Sidebar - Chat -->
+        <div class="sidebar">
+            <div class="container">
+                <div class="chat-container">
+                    <div class="chat-header">Genel Sohbet</div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message">
+                            <span class="sender">Sistem:</span> Sohbete hoş geldiniz! /tip [kullanıcı] [item] komutu ile item gönderebilirsiniz.
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+                        <button id="sendMessageBtn">Gönder</button>
+                    </div>
                 </div>
             </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
-                <button id="sendMessageBtn">Gönder</button>
+        </div>
+
+        <!-- Ana İçerik - CoinFlip -->
+        <div class="main-content">
+            <div class="container coinflip-container" id="coinflipContainer">
+                <div class="coinflip-header">
+                    <h1>Dedok Bet - CoinFlip</h1>
+                    <p>Risk al, kazançları topla! %50 şans ile paranı ikiye katla.</p>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-welcome">Hoş geldin, <strong id="coinflipUsername"></strong>!</div>
+                    <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
+                </div>
+                
+                <div class="top-buttons">
+                    <button class="top-btn" id="walletBtn">💰 Wallet</button>
+                </div>
+                
+                <div class="balance-card">
+                    <div>
+                        <h3>Toplam Value</h3>
+                        <div class="balance-amount" id="userBalance">0 Value</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-bottom: 15px;">Aktif Maçlar</h2>
+                <div class="matches-container" id="matchesContainer">
+                    <div class="no-matches" id="noMatchesMessage">
+                        Henüz aktif maç bulunmuyor. İlk maçı siz oluşturun!
+                    </div>
+                </div>
+                
+                <div class="create-match">
+                    <button class="create-btn" id="createMatchBtn">Yeni Maç Oluştur</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal'lar -->
     <!-- CoinFlip Animasyon Modal -->
     <div class="coinflip-modal" id="coinflipModal">
         <div class="coinflip-content">
@@ -1076,10 +1159,14 @@
                     <div class="no-item-selected">Henüz item seçilmedi</div>
                 </div>
                 <div class="total-value" id="totalTipValue">Toplam Value: 0</div>
-            </div>
-            
-            <div class="inventory-items" id="tipItems">
-                <!-- Itemler buraya eklenecek -->
+                
+                <div class="tip-instruction">
+                    Tüm itemlerden seçim yapabilirsiniz (envanterinizde olması gerekmez)
+                </div>
+                
+                <div class="all-items-grid" id="allItemsGrid">
+                    <!-- Tüm itemler buraya eklenecek -->
+                </div>
             </div>
             
             <div class="tip-buttons">
@@ -1092,6 +1179,7 @@
     <script>
         // DOM Elementleri
         const loginContainer = document.getElementById('loginContainer');
+        const appContainer = document.getElementById('appContainer');
         const coinflipContainer = document.getElementById('coinflipContainer');
         const step1 = document.getElementById('step1');
         const step2 = document.getElementById('step2');
@@ -1133,12 +1221,12 @@
         const totalMatchValue = document.getElementById('totalMatchValue');
         const tipModal = document.getElementById('tipModal');
         const closeTipBtn = document.getElementById('closeTipBtn');
-        const tipItems = document.getElementById('tipItems');
         const tipItemsPreview = document.getElementById('tipItemsPreview');
         const tipUsername = document.getElementById('tipUsername');
         const confirmTipBtn = document.getElementById('confirmTipBtn');
         const cancelTipBtn = document.getElementById('cancelTipBtn');
         const totalTipValue = document.getElementById('totalTipValue');
+        const allItemsGrid = document.getElementById('allItemsGrid');
         
         // Değişkenler
         let currentUser = null;
@@ -1151,7 +1239,27 @@
         let selectedSideForMatch = null;
         let selectedItemsForTip = [];
         let users = {};
-        
+
+        // Sayfa yüklendiğinde oturum kontrolü
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                userInventory = JSON.parse(localStorage.getItem('userInventory')) || [];
+                users = JSON.parse(localStorage.getItem('users')) || {};
+                
+                if (!users[currentUser]) {
+                    users[currentUser] = {
+                        username: currentUser,
+                        inventory: userInventory,
+                        totalValue: userInventory.reduce((total, item) => total + item.value, 0)
+                    };
+                }
+                
+                showMainApp();
+            }
+        });
+
         // Item tanımları
         const items = [
             {
@@ -1322,16 +1430,33 @@
             userInventory = [...users[currentUser].inventory];
             updateTotalValue();
             
-            // CoinFlip sayfasına yönlendirme
+            // LocalStorage'a kaydet
+            localStorage.setItem('currentUser', currentUser);
+            localStorage.setItem('userInventory', JSON.stringify(userInventory));
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMainApp();
+        });
+
+        // Ana uygulamayı göster
+        function showMainApp() {
             loginContainer.style.display = 'none';
-            coinflipContainer.style.display = 'block';
+            appContainer.style.display = 'flex';
+            coinflipContainer.style.display = 'flex';
             coinflipUsername.textContent = currentUser;
             updateMatchesDisplay();
-        });
+            
+            // Tüm itemleri tip modalı için yükle
+            loadAllItemsForTip();
+        }
         
         // Çıkış butonu tıklama olayı
         logoutBtn.addEventListener('click', function() {
-            coinflipContainer.style.display = 'none';
+            // LocalStorage'ı temizle
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userInventory');
+            
+            appContainer.style.display = 'none';
             loginContainer.style.display = 'block';
             showStep(1);
             // Formu sıfırla
@@ -1387,6 +1512,41 @@
             inventoryModal.style.display = 'flex';
         }
         
+        // Tüm itemleri tip için yükle
+        function loadAllItemsForTip() {
+            allItemsGrid.innerHTML = '';
+            
+            items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'quick-tip-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-value">${item.value}</div>
+                `;
+                
+                itemElement.addEventListener('click', function() {
+                    // Item zaten seçili mi kontrol et
+                    const existingIndex = selectedItemsForTip.findIndex(selected => selected.id === item.id);
+                    
+                    if (existingIndex !== -1) {
+                        // Item zaten seçili, kaldır
+                        selectedItemsForTip.splice(existingIndex, 1);
+                        itemElement.classList.remove('selected');
+                    } else {
+                        // Item seçili değil, ekle
+                        selectedItemsForTip.push(item);
+                        itemElement.classList.add('selected');
+                    }
+                    
+                    // Seçilen itemleri güncelle
+                    updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
+                });
+                
+                allItemsGrid.appendChild(itemElement);
+            });
+        }
+        
         // Withdraw modalını göster
         function showWithdrawModal(item) {
             withdrawItemInfo.innerHTML = `
@@ -1409,6 +1569,10 @@
                 userInventory = userInventory.filter(item => item.id !== selectedItemForWithdraw.id);
                 users[currentUser].inventory = userInventory;
                 updateTotalValue();
+                
+                // LocalStorage'ı güncelle
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                localStorage.setItem('users', JSON.stringify(users));
                 
                 // Modal'ları kapat
                 withdrawModal.style.display = 'none';
@@ -1541,17 +1705,28 @@
             container.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const itemId = parseInt(this.dataset.id);
-                    selectedItemsForMatch = selectedItemsForMatch.filter(item => item.id !== itemId);
+                    const itemsArray = container === selectedItemsPreview ? selectedItemsForMatch : selectedItemsForTip;
+                    
+                    const itemIndex = itemsArray.findIndex(item => item.id === itemId);
+                    if (itemIndex !== -1) {
+                        itemsArray.splice(itemIndex, 1);
+                    }
                     
                     // Item seçimini kaldır
-                    document.querySelectorAll('#createMatchItems .inventory-item').forEach(el => {
-                        if (parseInt(el.querySelector('.item-name').textContent) === itemId) {
+                    const sourceGrid = container === selectedItemsPreview ? createMatchItems : allItemsGrid;
+                    sourceGrid.querySelectorAll('.inventory-item, .quick-tip-item').forEach(el => {
+                        const itemName = el.querySelector('.item-name').textContent;
+                        const removedItem = items.find(item => item.name === itemName);
+                        if (removedItem && removedItem.id === itemId) {
                             el.classList.remove('selected');
                         }
                     });
                     
-                    updateSelectedItemsPreview(container, selectedItemsForMatch, totalElement);
-                    confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0 || selectedSideForMatch === null;
+                    updateSelectedItemsPreview(container, itemsArray, totalElement);
+                    
+                    if (container === selectedItemsPreview) {
+                        confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0 || selectedSideForMatch === null;
+                    }
                 });
             });
         }
@@ -1580,6 +1755,10 @@
                 });
                 users[currentUser].inventory = userInventory;
                 updateTotalValue();
+                
+                // LocalStorage'ı güncelle
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                localStorage.setItem('users', JSON.stringify(users));
                 
                 // Modal'ı kapat
                 createMatchModal.style.display = 'none';
@@ -1682,7 +1861,6 @@
         
         // Maç için tip modalını göster
         function showTipModalForMatch(match) {
-            tipItems.innerHTML = '';
             selectedItemsForTip = [];
             tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
             totalTipValue.textContent = 'Toplam Value: 0';
@@ -1694,41 +1872,10 @@
                 confirmJoinMatch(match);
             };
             
-            if (userInventory.length === 0) {
-                tipItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
-            } else {
-                userInventory.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'inventory-item';
-                    itemElement.innerHTML = `
-                        <div class="item-image">
-                            <img src="${item.image}" alt="${item.name}">
-                        </div>
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-value">${item.value} Value</div>
-                    `;
-                    
-                    itemElement.addEventListener('click', function() {
-                        // Item zaten seçili mi kontrol et
-                        const existingIndex = selectedItemsForTip.findIndex(selected => selected.id === item.id);
-                        
-                        if (existingIndex !== -1) {
-                            // Item zaten seçili, kaldır
-                            selectedItemsForTip.splice(existingIndex, 1);
-                            itemElement.classList.remove('selected');
-                        } else {
-                            // Item seçili değil, ekle
-                            selectedItemsForTip.push(item);
-                            itemElement.classList.add('selected');
-                        }
-                        
-                        // Seçilen itemleri güncelle
-                        updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
-                    });
-                    
-                    tipItems.appendChild(itemElement);
-                });
-            }
+            // Tüm item seçimlerini temizle
+            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
+                item.classList.remove('selected');
+            });
             
             tipModal.style.display = 'flex';
         }
@@ -1754,6 +1901,10 @@
             users[currentUser].inventory = userInventory;
             updateTotalValue();
             
+            // LocalStorage'ı güncelle
+            localStorage.setItem('userInventory', JSON.stringify(userInventory));
+            localStorage.setItem('users', JSON.stringify(users));
+            
             // Modal'ı kapat
             tipModal.style.display = 'none';
             
@@ -1775,6 +1926,10 @@
                 });
                 users[currentUser].inventory = userInventory;
                 updateTotalValue();
+                
+                // LocalStorage'ı güncelle
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                localStorage.setItem('users', JSON.stringify(users));
                 
                 addChatMessage("Sistem", `${currentUser} maçını iptal etti!`);
                 activeMatches.splice(matchIndex, 1);
@@ -1826,6 +1981,9 @@
                     });
                 }
                 
+                // LocalStorage'ı güncelle
+                localStorage.setItem('users', JSON.stringify(users));
+                
                 // Maçı listeden kaldır
                 activeMatches = activeMatches.filter(m => m.id !== match.id);
                 updateMatchesDisplay();
@@ -1855,16 +2013,16 @@
                         const targetUser = parts[1];
                         const itemName = parts.slice(2).join(' ');
                         
-                        // Item bul
-                        const itemToTip = userInventory.find(item => 
+                        // Tüm itemler arasında ara
+                        const itemToTip = items.find(item => 
                             item.name.toLowerCase() === itemName.toLowerCase()
                         );
                         
                         if (itemToTip) {
                             // Tip modalını göster
-                            showTipModal(targetUser, itemToTip);
+                            showTipModal(targetUser, [itemToTip]);
                         } else {
-                            addChatMessage("Sistem", "Item bulunamadı veya envanterinizde yok!");
+                            addChatMessage("Sistem", "Item bulunamadı!");
                         }
                     } else {
                         addChatMessage("Sistem", "Kullanım: /tip [kullanıcı] [item]");
@@ -1877,9 +2035,8 @@
         }
         
         // Tip modalını göster
-        function showTipModal(targetUser, item) {
-            tipItems.innerHTML = '';
-            selectedItemsForTip = [item];
+        function showTipModal(targetUser, initialItems = []) {
+            selectedItemsForTip = [...initialItems];
             tipItemsPreview.innerHTML = '';
             totalTipValue.textContent = 'Toplam Value: 0';
             tipUsername.value = targetUser;
@@ -1888,32 +2045,19 @@
             confirmTipBtn.textContent = 'Gönder';
             confirmTipBtn.onclick = confirmTip;
             
-            // Item'i göster
-            userInventory.forEach(invItem => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'inventory-item';
-                if (invItem.id === item.id) {
+            // Tüm item seçimlerini temizle
+            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // İlk itemleri seçili göster
+            initialItems.forEach(item => {
+                const itemElement = Array.from(allItemsGrid.children).find(el => 
+                    el.querySelector('.item-name').textContent === item.name
+                );
+                if (itemElement) {
                     itemElement.classList.add('selected');
                 }
-                itemElement.innerHTML = `
-                    <div class="item-image">
-                        <img src="${invItem.image}" alt="${invItem.name}">
-                    </div>
-                    <div class="item-name">${invItem.name}</div>
-                    <div class="item-value">${invItem.value} Value</div>
-                `;
-                
-                itemElement.addEventListener('click', function() {
-                    // Sadece bu item seçilebilir
-                    document.querySelectorAll('.inventory-item').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    itemElement.classList.add('selected');
-                    selectedItemsForTip = [invItem];
-                    updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
-                });
-                
-                tipItems.appendChild(itemElement);
             });
             
             updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
@@ -1929,7 +2073,7 @@
             }
             
             if (selectedItemsForTip.length === 0) {
-                alert("Lütfen bir item seçin!");
+                alert("Lütfen en az bir item seçin!");
                 return;
             }
             
@@ -1944,33 +2088,32 @@
             
             // Item'i gönder
             selectedItemsForTip.forEach(item => {
-                // Gönderenin envanterinden kaldır
-                userInventory = userInventory.filter(invItem => invItem.id !== item.id);
-                
                 // Alıcının envanterine ekle
                 if (!users[targetUser].inventory.some(invItem => invItem.id === item.id)) {
                     users[targetUser].inventory.push(item);
                 }
             });
             
-            // Envanteri güncelle
-            users[currentUser].inventory = userInventory;
-            updateTotalValue();
+            // LocalStorage'ı güncelle
+            localStorage.setItem('users', JSON.stringify(users));
             
             addChatMessage("Sistem", `${currentUser}, ${targetUser} kullanıcısına item gönderdi!`);
             
             // Modal'ı kapat
             tipModal.style.display = 'none';
+            selectedItemsForTip = [];
         }
         
         // Tip iptal
         cancelTipBtn.addEventListener('click', function() {
             tipModal.style.display = 'none';
+            selectedItemsForTip = [];
         });
         
         // Tip modal kapatma
         closeTipBtn.addEventListener('click', function() {
             tipModal.style.display = 'none';
+            selectedItemsForTip = [];
         });
         
         function addChatMessage(sender, message) {
@@ -2010,6 +2153,15 @@
         usernameInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 loginBtn.click();
+            }
+        });
+
+        // Sayfa kapatıldığında verileri kaydet
+        window.addEventListener('beforeunload', function() {
+            if (currentUser) {
+                localStorage.setItem('currentUser', currentUser);
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                localStorage.setItem('users', JSON.stringify(users));
             }
         });
     </script>
