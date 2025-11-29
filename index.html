@@ -249,6 +249,12 @@
             color: #4CAF50;
         }
         
+        .profit-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff8a00;
+        }
+        
         .matches-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -539,7 +545,7 @@
         }
         
         .flipping {
-            animation: flip 2s infinite;
+            animation: flip 2s ease-in-out;
         }
         
         @keyframes flip {
@@ -589,8 +595,8 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
-            max-width: 600px;
-            width: 90%;
+            max-width: 800px;
+            width: 95%;
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -616,14 +622,16 @@
         
         .inventory-items {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            max-height: 60vh;
+            overflow-y: auto;
         }
         
         .inventory-item {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -631,7 +639,7 @@
         }
         
         .inventory-item:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
@@ -640,10 +648,10 @@
         }
         
         .item-image {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 10px;
-            border-radius: 10px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 5px;
+            border-radius: 8px;
             overflow: hidden;
         }
         
@@ -655,12 +663,13 @@
         
         .item-name {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            font-size: 12px;
         }
         
         .item-value {
             color: #4CAF50;
-            font-size: 14px;
+            font-size: 11px;
         }
         
         .top-buttons {
@@ -779,8 +788,10 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
-            max-width: 500px;
-            width: 90%;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .selected-items-preview {
@@ -891,8 +902,10 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
-            max-width: 500px;
-            width: 90%;
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .tip-form {
@@ -940,17 +953,17 @@
         
         .all-items-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
             margin-top: 15px;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         
         .quick-tip-item {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -967,8 +980,8 @@
         }
         
         .quick-tip-item img {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 5px;
             margin-bottom: 5px;
         }
@@ -1001,9 +1014,66 @@
             background: #f44336;
             color: white;
         }
+        
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 15px;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Join Match Modal */
+        .join-match-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .join-match-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
+    <!-- Başarılı Bildirim -->
+    <div class="success-notification" id="successNotification">Maç başarıyla oluşturuldu!</div>
+
     <!-- Bağlantı Durumu -->
     <div class="connection-status disconnected" id="connectionStatus">🔴 Çevrimdışı</div>
 
@@ -1087,6 +1157,7 @@
                     <div>
                         <h3>Toplam Value</h3>
                         <div class="balance-amount" id="userBalance">0 Value</div>
+                        <div class="profit-amount" id="userProfit">+0 Profit</div>
                     </div>
                 </div>
                 
@@ -1131,19 +1202,37 @@
         </div>
     </div>
 
-    <!-- Withdraw Modal -->
-    <div class="withdraw-modal" id="withdrawModal">
-        <div class="withdraw-content">
-            <h2>Item'i Withdraw Et</h2>
-            <div class="withdraw-item" id="withdrawItemInfo">
-                <!-- Item bilgisi buraya eklenecek -->
+    <!-- Maça Katılma Modal -->
+    <div class="join-match-modal" id="joinMatchModal">
+        <div class="join-match-content">
+            <div class="inventory-header">
+                <h2>Maça Katıl - Item Seçin</h2>
+                <button class="close-btn" id="closeJoinMatchBtn">×</button>
             </div>
-            <p>Bu item'i withdraw etmek istediğinizden emin misiniz?</p>
-            <p style="color: #ff8a00; margin: 10px 0;">Şu anda yapım aşamasında. Discord üzerinden moderatörle iletişime geçin.</p>
-            <div class="withdraw-buttons">
-                <button class="withdraw-confirm" id="confirmWithdrawBtn">Evet</button>
-                <button class="withdraw-cancel" id="cancelWithdrawBtn">Hayır</button>
+            
+            <div class="search-bar">
+                <input type="text" id="joinItemSearch" placeholder="Item ara...">
             </div>
+            
+            <div class="selected-items-preview" id="joinSelectedItemsPreview">
+                <div class="no-item-selected">Henüz item seçilmedi</div>
+            </div>
+            
+            <div class="total-value" id="joinTotalValue">Toplam Value: 0</div>
+            
+            <div class="side-selection">
+                <h3>Karşı Tarafın Seçimi: <span id="opponentSide"></span></h3>
+                <div class="side-buttons">
+                    <button class="side-btn heads" data-side="heads">HEADS</button>
+                    <button class="side-btn tails" data-side="tails">TAILS</button>
+                </div>
+            </div>
+            
+            <div class="inventory-items" id="joinMatchItems">
+                <!-- Itemler buraya eklenecek -->
+            </div>
+            
+            <button class="btn" id="confirmJoinMatchBtn" style="margin-top: 20px;" disabled>Maça Katıl</button>
         </div>
     </div>
 
@@ -1153,6 +1242,10 @@
             <div class="inventory-header">
                 <h2>Maç İçin Item Seçin</h2>
                 <button class="close-btn" id="closeCreateMatchBtn">×</button>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="itemSearch" placeholder="Item ara...">
             </div>
             
             <div class="selected-items-preview" id="selectedItemsPreview">
@@ -1177,37 +1270,6 @@
         </div>
     </div>
 
-    <!-- Tip Modal -->
-    <div class="tip-modal" id="tipModal">
-        <div class="tip-content">
-            <div class="inventory-header">
-                <h2>Item Gönder</h2>
-                <button class="close-btn" id="closeTipBtn">×</button>
-            </div>
-            
-            <div class="tip-form">
-                <input type="text" id="tipUsername" placeholder="Kullanıcı adı">
-                <div class="selected-items-preview" id="tipItemsPreview">
-                    <div class="no-item-selected">Henüz item seçilmedi</div>
-                </div>
-                <div class="total-value" id="totalTipValue">Toplam Value: 0</div>
-                
-                <div class="tip-instruction">
-                    Tüm itemlerden seçim yapabilirsiniz (envanterinizde olması gerekmez)
-                </div>
-                
-                <div class="all-items-grid" id="allItemsGrid">
-                    <!-- Tüm itemler buraya eklenecek -->
-                </div>
-            </div>
-            
-            <div class="tip-buttons">
-                <button class="tip-confirm" id="confirmTipBtn" disabled>Gönder</button>
-                <button class="tip-cancel" id="cancelTipBtn">İptal</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // SUPABASE AYARLARI
         const SUPABASE_URL = 'https://vkuhfhjibegquqatxmyt.supabase.co';
@@ -1215,93 +1277,6 @@
 
         // Supabase bağlantısı
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Supabase Backend Fonksiyonları
-        class SupabaseBackend {
-            // Kullanıcı kayıt
-            static async registerUser(username) {
-                const { data, error } = await supabase
-                    .from('users')
-                    .insert([{ username, inventory: '[]' }])
-                    .select();
-                
-                return { success: !error, user: data ? data[0] : null };
-            }
-
-            // Chat mesajı gönder
-            static async sendMessage(sender, message) {
-                const { error } = await supabase
-                    .from('chat_messages')
-                    .insert([{ sender, message }]);
-                
-                return { success: !error };
-            }
-
-            // Yeni maç oluştur
-            static async createMatch(matchData) {
-                // Items'i JSON formatına çevir
-                const matchToInsert = {
-                    ...matchData,
-                    items: JSON.stringify(matchData.items),
-                    player2_items: matchData.player2_items ? JSON.stringify(matchData.player2_items) : null
-                };
-                
-                const { data, error } = await supabase
-                    .from('matchlist')
-                    .insert([matchToInsert])
-                    .select();
-                
-                return { success: !error, match: data ? data[0] : null };
-            }
-
-            // Tüm maçları getir
-            static async getMatches() {
-                const { data, error } = await supabase
-                    .from('matchlist')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error('Maçlar yüklenirken hata:', error);
-                    return [];
-                }
-                
-                // JSON verilerini parse et
-                return data.map(match => ({
-                    ...match,
-                    items: match.items ? JSON.parse(match.items) : [],
-                    player2_items: match.player2_items ? JSON.parse(match.player2_items) : null
-                }));
-            }
-
-            // Maça katıl
-            static async joinMatch(matchId, playerData) {
-                const { error } = await supabase
-                    .from('matchlist')
-                    .update({ 
-                        player2: playerData.username,
-                        player2_items: JSON.stringify(playerData.items),
-                        status: 'active'
-                    })
-                    .eq('id', matchId);
-                
-                return { success: !error };
-            }
-
-            // Tüm chat mesajlarını getir
-            static async getChatMessages() {
-                const { data, error } = await supabase
-                    .from('chat_messages')
-                    .select('*')
-                    .order('created_at', { ascending: true })
-                    .limit(50);
-                
-                return error ? [] : data;
-            }
-        }
-
-        // Eski BackendAPI yerine bunu kullan
-        const BackendAPI = SupabaseBackend;
 
         // DOM Elementleri
         const loginContainer = document.getElementById('loginContainer');
@@ -1323,48 +1298,44 @@
         const noMatchesMessage = document.getElementById('noMatchesMessage');
         const logoutBtn = document.getElementById('logoutBtn');
         const createMatchBtn = document.getElementById('createMatchBtn');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const userBalance = document.getElementById('userBalance');
+        const userProfit = document.getElementById('userProfit');
+        const successNotification = document.getElementById('successNotification');
         const coinflipModal = document.getElementById('coinflipModal');
         const coin = document.getElementById('coin');
         const coinflipResult = document.getElementById('coinflipResult');
         const closeModalBtn = document.getElementById('closeModalBtn');
-        const walletBtn = document.getElementById('walletBtn');
-        const inventoryModal = document.getElementById('inventoryModal');
-        const closeInventoryBtn = document.getElementById('closeInventoryBtn');
-        const inventoryItems = document.getElementById('inventoryItems');
-        const withdrawModal = document.getElementById('withdrawModal');
-        const withdrawItemInfo = document.getElementById('withdrawItemInfo');
-        const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
-        const cancelWithdrawBtn = document.getElementById('cancelWithdrawBtn');
+        
+        // Create Match Modal Elements
         const createMatchModal = document.getElementById('createMatchModal');
         const closeCreateMatchBtn = document.getElementById('closeCreateMatchBtn');
         const createMatchItems = document.getElementById('createMatchItems');
         const selectedItemsPreview = document.getElementById('selectedItemsPreview');
         const confirmCreateMatchBtn = document.getElementById('confirmCreateMatchBtn');
-        const userBalance = document.getElementById('userBalance');
         const totalMatchValue = document.getElementById('totalMatchValue');
-        const tipModal = document.getElementById('tipModal');
-        const closeTipBtn = document.getElementById('closeTipBtn');
-        const tipItemsPreview = document.getElementById('tipItemsPreview');
-        const tipUsername = document.getElementById('tipUsername');
-        const confirmTipBtn = document.getElementById('confirmTipBtn');
-        const cancelTipBtn = document.getElementById('cancelTipBtn');
-        const totalTipValue = document.getElementById('totalTipValue');
-        const allItemsGrid = document.getElementById('allItemsGrid');
-        const connectionStatus = document.getElementById('connectionStatus');
+        const itemSearch = document.getElementById('itemSearch');
+        
+        // Join Match Modal Elements
+        const joinMatchModal = document.getElementById('joinMatchModal');
+        const closeJoinMatchBtn = document.getElementById('closeJoinMatchBtn');
+        const joinMatchItems = document.getElementById('joinMatchItems');
+        const joinSelectedItemsPreview = document.getElementById('joinSelectedItemsPreview');
+        const confirmJoinMatchBtn = document.getElementById('confirmJoinMatchBtn');
+        const joinTotalValue = document.getElementById('joinTotalValue');
+        const joinItemSearch = document.getElementById('joinItemSearch');
+        const opponentSide = document.getElementById('opponentSide');
         
         // Değişkenler
         let currentUser = null;
         let verificationCode = '';
         let activeMatches = [];
         let userInventory = [];
-        let selectedItemForWithdraw = null;
         let selectedItemsForMatch = [];
         let selectedSideForMatch = null;
-        let selectedItemsForTip = [];
-        let users = {};
+        let selectedItemsForJoin = [];
+        let selectedSideForJoin = null;
+        let totalProfit = 0;
+        let currentMatchId = null;
 
         // Item tanımları
         const items = [
@@ -1472,99 +1443,16 @@
             }
         ];
 
-        // Real-time dinleyicileri başlat
-        function initializeRealtimeListeners() {
-            console.log('Real-time dinleyiciler başlatılıyor...');
-            
-            // Chat mesajları için real-time dinleyici
-            supabase
-                .channel('public:chat_messages')
-                .on('postgres_changes', 
-                    { 
-                        event: 'INSERT', 
-                        schema: 'public', 
-                        table: 'chat_messages' 
-                    }, 
-                    (payload) => {
-                        console.log('Yeni mesaj geldi:', payload);
-                        addChatMessage(payload.new.sender, payload.new.message);
-                    }
-                )
-                .subscribe();
-
-            // Maçlar için real-time dinleyici
-            supabase
-                .channel('public:matchlist')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'matchlist' 
-                    }, 
-                    (payload) => {
-                        console.log('Maç değişikliği:', payload);
-                        handleMatchChange(payload);
-                    }
-                )
-                .subscribe();
-        }
-
-        // Maç değişikliklerini işle
-        function handleMatchChange(payload) {
-            if (payload.eventType === 'INSERT') {
-                // Yeni maç eklendi
-                const newMatch = {
-                    ...payload.new,
-                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
-                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
-                };
-                
-                if (!activeMatches.some(m => m.id === newMatch.id)) {
-                    activeMatches.push(newMatch);
-                    updateMatchesDisplay();
-                    addChatMessage("Sistem", `${newMatch.creator} yeni bir CoinFlip maçı oluşturdu!`);
-                }
-            } else if (payload.eventType === 'UPDATE') {
-                // Maç güncellendi
-                const updatedMatch = {
-                    ...payload.new,
-                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
-                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
-                };
-                
-                const index = activeMatches.findIndex(m => m.id === updatedMatch.id);
-                if (index !== -1) {
-                    activeMatches[index] = updatedMatch;
-                    updateMatchesDisplay();
-                    
-                    if (updatedMatch.player2 && !payload.old.player2) {
-                        addChatMessage("Sistem", `${updatedMatch.player2} ${updatedMatch.creator}'ın maçına katıldı!`);
-                    }
-                }
-            } else if (payload.eventType === 'DELETE') {
-                // Maç silindi
-                activeMatches = activeMatches.filter(m => m.id !== payload.old.id);
-                updateMatchesDisplay();
-            }
-        }
-
-        // Chat mesajı ekle
-        function addChatMessage(sender, message) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message';
-            messageElement.innerHTML = `<span class="sender">${sender}:</span> ${message}`;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
         // Sayfa yüklendiğinde oturum kontrolü
         document.addEventListener('DOMContentLoaded', async function() {
             const savedUser = localStorage.getItem('currentUser');
+            const savedProfit = localStorage.getItem('totalProfit');
+            
             if (savedUser) {
                 currentUser = savedUser;
                 userInventory = JSON.parse(localStorage.getItem('userInventory')) || [];
+                totalProfit = savedProfit ? parseInt(savedProfit) : 0;
                 
-                // Eğer envanter boşsa, tüm itemleri ekle
                 if (userInventory.length === 0) {
                     userInventory = [...items];
                     localStorage.setItem('userInventory', JSON.stringify(userInventory));
@@ -1578,7 +1466,6 @@
         loginBtn.addEventListener('click', function() {
             const username = usernameInput.value.trim();
             
-            // Doğrulamalar
             if (!username) {
                 showError(step1Error, "Lütfen Roblox kullanıcı adınızı girin.");
                 return;
@@ -1589,16 +1476,12 @@
                 return;
             }
             
-            // Hata mesajını temizle
             hideError(step1Error);
-            
-            // Kullanıcı adını göster ve doğrulama kodu oluştur
             usernameDisplay.textContent = username;
             generateVerificationCode();
             showStep(2);
         });
         
-        // Doğrulama kodu oluşturma
         function generateVerificationCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
@@ -1609,27 +1492,19 @@
             verificationCodeDisplay.textContent = code;
         }
         
-        // Geri butonu tıklama olayı
         backBtn.addEventListener('click', function() {
             showStep(1);
         });
         
-        // Doğrulama butonu tıklama olayı
         verifyBtn.addEventListener('click', async function() {
-            // Gerçek uygulamada burada Roblox API ile açıklama kontrolü yapılmalı
-            // Bu örnekte doğrulamayı atlıyoruz
-            
-            // Hata mesajını temizle
             hideError(step2Error);
-            
-            // Başarılı giriş
             currentUser = usernameInput.value.trim();
-            
-            // Yeni kullanıcıya tüm itemleri ekle
             userInventory = [...items];
+            totalProfit = 0;
             
             localStorage.setItem('currentUser', currentUser);
             localStorage.setItem('userInventory', JSON.stringify(userInventory));
+            localStorage.setItem('totalProfit', totalProfit.toString());
             
             await showMainApp();
         });
@@ -1641,320 +1516,68 @@
             coinflipContainer.style.display = 'flex';
             coinflipUsername.textContent = currentUser;
             
-            try {
-                // Mevcut maçları yükle
-                const matches = await BackendAPI.getMatches();
-                activeMatches = matches;
-                updateMatchesDisplay();
-                
-                // Mevcut chat mesajlarını yükle
-                const chatMessagesData = await BackendAPI.getChatMessages();
-                chatMessages.innerHTML = '';
-                chatMessagesData.forEach(msg => {
-                    addChatMessage(msg.sender, msg.message);
-                });
-                
-                // Real-time dinleyicileri başlat
-                initializeRealtimeListeners();
-                
-                // Bağlantı durumunu güncelle
-                connectionStatus.textContent = '🟢 Çevrimiçi';
-                connectionStatus.className = 'connection-status connected';
-                
-                // Toplam value'yi güncelle
-                updateTotalValue();
-                
-                // Tüm itemleri tip modalı için yükle
-                loadAllItemsForTip();
-                
-                console.log('Uygulama başlatıldı:', { currentUser, matchesCount: activeMatches.length });
-            } catch (error) {
-                console.error('Uygulama başlatılırken hata:', error);
-            }
+            updateTotalValue();
+            updateProfitDisplay();
+            loadActiveMatches();
+            
+            // Real-time dinleyiciyi başlat
+            initializeRealtimeListener();
+            
+            connectionStatus.textContent = '🟢 Çevrimiçi';
+            connectionStatus.className = 'connection-status connected';
         }
 
-        // Mesaj gönderme
-        sendMessageBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (message && currentUser) {
-                if (message.startsWith('/tip ')) {
-                    const parts = message.split(' ');
-                    if (parts.length >= 3) {
-                        const targetUser = parts[1];
-                        const itemName = parts.slice(2).join(' ');
-                        const itemToTip = items.find(item => 
-                            item.name.toLowerCase() === itemName.toLowerCase()
-                        );
-                        
-                        if (itemToTip) {
-                            showTipModal(targetUser, [itemToTip]);
-                        } else {
-                            addChatMessage("Sistem", "Item bulunamadı!");
-                        }
-                    } else {
-                        addChatMessage("Sistem", "Kullanım: /tip [kullanıcı] [item]");
+        // Real-time dinleyici
+        function initializeRealtimeListener() {
+            // Maçlar için real-time dinleyici
+            supabase
+                .channel('public:matches')
+                .on('postgres_changes', 
+                    { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'matches' 
+                    }, 
+                    (payload) => {
+                        console.log('Maç değişikliği:', payload);
+                        loadActiveMatches();
                     }
-                } else {
-                    // Mesajı Supabase'e kaydet
-                    const result = await BackendAPI.sendMessage(currentUser, message);
-                    if (!result.success) {
-                        addChatMessage("Sistem", "Mesaj gönderilemedi!");
-                    }
-                }
-                chatInput.value = '';
-            }
+                )
+                .subscribe();
         }
 
-        // Tip gönderme butonu event listener
-        confirmTipBtn.addEventListener('click', async function() {
-            await sendTip();
-        });
-
-        // İptal butonu
-        cancelTipBtn.addEventListener('click', function() {
-            tipModal.style.display = 'none';
-            resetTipModal();
-        });
-
-        // Kapat butonu
-        closeTipBtn.addEventListener('click', function() {
-            tipModal.style.display = 'none';
-            resetTipModal();
-        });
-
-        // Kullanıcı adı input değişikliği
-        tipUsername.addEventListener('input', function() {
-            updateTipButtonState();
-        });
-
-        // Tip gönderme fonksiyonu
-        async function sendTip() {
-            const targetUser = tipUsername.value.trim();
-            
-            if (!targetUser) {
-                alert('Lütfen bir kullanıcı adı girin!');
-                return;
-            }
-            
-            if (selectedItemsForTip.length === 0) {
-                alert('Lütfen en az bir item seçin!');
-                return;
-            }
-            
-            if (targetUser === currentUser) {
-                alert('Kendinize item gönderemezsiniz!');
-                return;
-            }
-            
-            try {
-                // Chat'e tip mesajı gönder
-                const itemNames = selectedItemsForTip.map(item => item.name).join(', ');
-                const totalValue = selectedItemsForTip.reduce((sum, item) => sum + item.value, 0);
-                const message = `${currentUser}, ${targetUser} kullanıcısına toplam ${totalValue} value değerinde item gönderdi: ${itemNames}`;
-                
-                const result = await BackendAPI.sendMessage("Sistem", message);
-                
-                if (result.success) {
-                    // Başarılı mesaj
-                    addChatMessage("Sistem", `${currentUser}, ${targetUser} kullanıcısına ${itemNames} itemlerini gönderdi!`);
-                    
-                    // Modal'ı kapat ve sıfırla
-                    tipModal.style.display = 'none';
-                    resetTipModal();
-                    
-                    alert('Item başarıyla gönderildi!');
-                } else {
-                    alert('Item gönderilirken hata oluştu!');
-                }
-            } catch (error) {
-                console.error('Tip gönderme hatası:', error);
-                alert('Item gönderilirken hata oluştu!');
-            }
-        }
-
-        // Tip modalını sıfırla
-        function resetTipModal() {
-            tipUsername.value = '';
-            selectedItemsForTip = [];
-            updateTipPreview();
-            updateTipButtonState();
-            
-            // Grid'deki seçimleri temizle
-            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-        }
-
-        // Tip buton durumunu güncelle
-        function updateTipButtonState() {
-            const hasUsername = tipUsername.value.trim().length > 0;
-            const hasItems = selectedItemsForTip.length > 0;
-            
-            confirmTipBtn.disabled = !(hasUsername && hasItems);
-        }
-
-        // Tüm itemleri yükle (tip için)
-        function loadAllItemsForTip() {
-            allItemsGrid.innerHTML = '';
-            
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'quick-tip-item';
-                itemElement.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50/333/fff?text=?'">
-                    <div>${item.name}</div>
-                    <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
-                `;
-                
-                itemElement.addEventListener('click', () => {
-                    itemElement.classList.toggle('selected');
-                    
-                    if (itemElement.classList.contains('selected')) {
-                        selectedItemsForTip.push(item);
-                    } else {
-                        selectedItemsForTip = selectedItemsForTip.filter(i => i.id !== item.id);
-                    }
-                    
-                    updateTipPreview();
-                    updateTipButtonState();
-                });
-                
-                allItemsGrid.appendChild(itemElement);
-            });
-        }
-
-        // Tip önizlemesini güncelle
-        function updateTipPreview() {
-            tipItemsPreview.innerHTML = '';
-            
-            if (selectedItemsForTip.length === 0) {
-                tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
-                totalTipValue.textContent = 'Toplam Value: 0';
-                return;
-            }
-            
-            let totalValue = 0;
-            selectedItemsForTip.forEach(item => {
-                totalValue += item.value;
-                
-                const selectedItem = document.createElement('div');
-                selectedItem.className = 'selected-item';
-                selectedItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/40x40/333/fff?text=?'">
-                    <div class="selected-item-info">
-                        <div>${item.name}</div>
-                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
-                    </div>
-                    <button class="remove-item" data-id="${item.id}">×</button>
-                `;
-                
-                tipItemsPreview.appendChild(selectedItem);
-            });
-            
-            totalTipValue.textContent = `Toplam Value: ${totalValue}`;
-            
-            // Remove butonlarına event listener ekle
-            tipItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    selectedItemsForTip = selectedItemsForTip.filter(item => item.id !== itemId);
-                    updateTipPreview();
-                    updateTipButtonState();
-                    
-                    // Grid'deki seçimi de kaldır
-                    allItemsGrid.querySelectorAll('.quick-tip-item').forEach(gridItem => {
-                        if (gridItem.querySelector('div').textContent === items.find(i => i.id === itemId)?.name) {
-                            gridItem.classList.remove('selected');
-                        }
-                    });
-                });
-            });
-        }
-
-        // Tip modalını göster
-        function showTipModal(targetUser = '', preSelectedItems = []) {
-            tipUsername.value = targetUser;
-            selectedItemsForTip = [...preSelectedItems];
-            updateTipPreview();
-            updateTipButtonState();
-            
-            // Grid'deki seçimleri güncelle
-            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
-                const itemName = item.querySelector('div').textContent;
-                const isSelected = selectedItemsForTip.some(selected => selected.name === itemName);
-                item.classList.toggle('selected', isSelected);
-            });
-            
-            tipModal.style.display = 'flex';
-        }
-
-        // Maç oluşturma onayı
-        confirmCreateMatchBtn.addEventListener('click', async function() {
-            if (selectedItemsForMatch.length > 0 && selectedSideForMatch) {
-                const totalValue = selectedItemsForMatch.reduce((total, item) => total + item.value, 0);
-                
-                const newMatch = {
-                    creator: currentUser,
+        // Aktif maçları yükle
+        async function loadActiveMatches() {
+            // Demo maçlar - gerçek uygulamada Supabase'den çekilecek
+            activeMatches = [
+                {
+                    id: 1,
+                    creator: "Player1",
                     player2: null,
-                    items: [...selectedItemsForMatch],
-                    side: selectedSideForMatch,
-                    totalValue: totalValue,
-                    pot: totalValue * 2,
+                    items: [items[0], items[1]],
+                    player2_items: null,
+                    side: "heads",
+                    totalValue: 23825,
+                    pot: 47650,
                     status: 'waiting'
-                };
-                
-                // Maçı Supabase'e kaydet
-                const result = await BackendAPI.createMatch(newMatch);
-                
-                if (result.success) {
-                    // Maç real-time olarak diğer kullanıcılara iletilecek
-                    console.log('Maç oluşturuldu:', result.match);
-                    
-                    // Seçilen itemleri envanterden kaldır
-                    selectedItemsForMatch.forEach(item => {
-                        userInventory = userInventory.filter(invItem => invItem.id !== item.id);
-                    });
-                    updateTotalValue();
-                    
-                    localStorage.setItem('userInventory', JSON.stringify(userInventory));
-                    
-                    createMatchModal.style.display = 'none';
-                } else {
-                    alert("Maç oluşturulurken hata oluştu!");
+                },
+                {
+                    id: 2,
+                    creator: "Player2", 
+                    player2: null,
+                    items: [items[2], items[3]],
+                    player2_items: null,
+                    side: "tails",
+                    totalValue: 7100,
+                    pot: 14200,
+                    status: 'waiting'
                 }
-            }
-        });
-
-        // Yardımcı Fonksiyonlar
-        function showStep(stepNumber) {
-            document.querySelectorAll('.step').forEach(step => {
-                step.classList.remove('active');
-            });
-            document.getElementById('step' + stepNumber).classList.add('active');
+            ];
+            
+            updateMatchesDisplay();
         }
 
-        function showError(errorElement, message) {
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-
-        function hideError(errorElement) {
-            errorElement.style.display = 'none';
-        }
-
-        function updateTotalValue() {
-            const total = userInventory.reduce((sum, item) => sum + item.value, 0);
-            userBalance.textContent = total + ' Value';
-        }
-
-        // Maçları güncelle
+        // Maçları göster
         function updateMatchesDisplay() {
             matchesContainer.innerHTML = '';
             
@@ -1970,10 +1593,12 @@
                 matchCard.className = 'match-card';
                 
                 const totalValue = match.items.reduce((sum, item) => sum + item.value, 0);
+                const isMyMatch = match.creator === currentUser;
+                const isFull = match.player2 !== null;
                 
                 matchCard.innerHTML = `
                     <div class="match-header">
-                        <div class="match-id">${match.id}</div>
+                        <div class="match-id">Maç #${match.id}</div>
                         <div class="match-pot">${totalValue * 2} Value</div>
                     </div>
                     <div class="players">
@@ -1988,8 +1613,8 @@
                             <div class="player-bet">${match.player2 ? (match.player2_items ? match.player2_items.reduce((sum, item) => sum + item.value, 0) : 0) + ' Value' : ''}</div>
                         </div>
                     </div>
-                    <button class="join-btn" ${match.creator === currentUser || match.player2 ? 'disabled' : ''}>
-                        ${match.creator === currentUser ? 'Sizin Maçınız' : (match.player2 ? 'Maç Dolu' : 'Katıl')}
+                    <button class="join-btn" ${isMyMatch || isFull ? 'disabled' : ''}>
+                        ${isMyMatch ? 'Sizin Maçınız' : (isFull ? 'Maç Dolu' : 'Katıl')}
                     </button>
                 `;
                 
@@ -2003,52 +1628,205 @@
         }
 
         // Maça katıl
-        async function joinMatch(matchId) {
+        function joinMatch(matchId) {
             const match = activeMatches.find(m => m.id === matchId);
             if (!match) return;
             
-            // Kullanıcının envanterini göster
-            showInventoryForMatch(matchId);
+            currentMatchId = matchId;
+            selectedItemsForJoin = [];
+            selectedSideForJoin = null;
+            opponentSide.textContent = match.side.toUpperCase();
+            updateJoinMatchPreview();
+            loadInventoryForJoinMatch();
+            joinMatchModal.style.display = 'flex';
         }
 
-        // Envanteri göster (maç için)
-        function showInventoryForMatch(matchId) {
-            inventoryItems.innerHTML = '';
+        // Maça katılma modalını yükle
+        function loadInventoryForJoinMatch() {
+            renderFilteredItemsForJoinMatch(userInventory);
+            joinItemSearch.value = '';
+        }
+
+        function renderFilteredItemsForJoinMatch(filteredItems) {
+            joinMatchItems.innerHTML = '';
             
-            if (userInventory.length === 0) {
-                inventoryItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            if (filteredItems.length === 0) {
+                joinMatchItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Item bulunamadı</div>';
                 return;
             }
             
-            userInventory.forEach(item => {
+            filteredItems.forEach(item => {
+                const isSelected = selectedItemsForJoin.some(selected => selected.id === item.id);
                 const itemElement = document.createElement('div');
-                itemElement.className = 'inventory-item';
+                itemElement.className = `inventory-item ${isSelected ? 'selected' : ''}`;
                 itemElement.innerHTML = `
                     <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/60x60/333/fff?text=?'">
                     </div>
                     <div class="item-name">${item.name}</div>
                     <div class="item-value">${item.value} Value</div>
                 `;
                 
                 itemElement.addEventListener('click', () => {
-                    // Item seçimi burada yapılacak
-                    selectItemForMatch(item, matchId);
+                    if (isSelected) {
+                        selectedItemsForJoin = selectedItemsForJoin.filter(selected => selected.id !== item.id);
+                        itemElement.classList.remove('selected');
+                    } else {
+                        selectedItemsForJoin.push(item);
+                        itemElement.classList.add('selected');
+                    }
+                    updateJoinMatchPreview();
                 });
                 
-                inventoryItems.appendChild(itemElement);
+                joinMatchItems.appendChild(itemElement);
+            });
+        }
+
+        function updateJoinMatchPreview() {
+            joinSelectedItemsPreview.innerHTML = '';
+            
+            if (selectedItemsForJoin.length === 0) {
+                joinSelectedItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+                joinTotalValue.textContent = 'Toplam Value: 0';
+                confirmJoinMatchBtn.disabled = true;
+                return;
+            }
+            
+            let totalValue = 0;
+            selectedItemsForJoin.forEach(item => {
+                totalValue += item.value;
+                
+                const selectedItem = document.createElement('div');
+                selectedItem.className = 'selected-item';
+                selectedItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/40x40/333/fff?text=?'">
+                    <div class="selected-item-info">
+                        <div>${item.name}</div>
+                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                `;
+                
+                joinSelectedItemsPreview.appendChild(selectedItem);
             });
             
-            inventoryModal.style.display = 'flex';
+            joinTotalValue.textContent = `Toplam Value: ${totalValue}`;
+            confirmJoinMatchBtn.disabled = !selectedSideForJoin;
+            
+            joinSelectedItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    selectedItemsForJoin = selectedItemsForJoin.filter(item => item.id !== itemId);
+                    updateJoinMatchPreview();
+                    loadInventoryForJoinMatch();
+                });
+            });
         }
 
-        function selectItemForMatch(item, matchId) {
-            // Bu fonksiyon maça katılmak için item seçimini yönetecek
-            console.log('Item selected for match:', item, matchId);
-            // Burada maça katılma işlemini tamamlayacak kod olacak
+        // Join match side selection
+        joinMatchModal.querySelectorAll('.side-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                joinMatchModal.querySelectorAll('.side-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedSideForJoin = this.getAttribute('data-side');
+                confirmJoinMatchBtn.disabled = selectedItemsForJoin.length === 0;
+            });
+        });
+
+        // Maça katılma onayı
+        confirmJoinMatchBtn.addEventListener('click', function() {
+            if (selectedItemsForJoin.length > 0 && selectedSideForJoin) {
+                // CoinFlip animasyonunu başlat
+                startCoinFlipAnimation(currentMatchId, selectedSideForJoin);
+                joinMatchModal.style.display = 'none';
+            }
+        });
+
+        // CoinFlip animasyonu
+        function startCoinFlipAnimation(matchId, playerSide) {
+            const match = activeMatches.find(m => m.id === matchId);
+            if (!match) return;
+            
+            const opponentSide = match.side;
+            const winner = Math.random() > 0.5 ? 'heads' : 'tails';
+            const isWinner = playerSide === winner;
+            
+            // Animasyonu başlat
+            coin.classList.add('flipping');
+            coinflipModal.style.display = 'flex';
+            
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+                
+                if (isWinner) {
+                    coinflipResult.innerHTML = `<span class="winner">🎉 KAZANDIN! 🎉</span>`;
+                    // Kazananın ödülü
+                    const totalWinnings = match.items.reduce((sum, item) => sum + item.value, 0) + 
+                                         selectedItemsForJoin.reduce((sum, item) => sum + item.value, 0);
+                    totalProfit += totalWinnings;
+                    // Kazanan itemleri alır
+                    userInventory = [...userInventory, ...match.items];
+                } else {
+                    coinflipResult.innerHTML = `<span class="loser">😞 KAYBETTİN!</span>`;
+                    // Kaybeden itemlerini kaybeder
+                    selectedItemsForJoin.forEach(item => {
+                        userInventory = userInventory.filter(invItem => invItem.id !== item.id);
+                    });
+                    totalProfit -= selectedItemsForJoin.reduce((sum, item) => sum + item.value, 0);
+                }
+                
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                localStorage.setItem('totalProfit', totalProfit.toString());
+                updateTotalValue();
+                updateProfitDisplay();
+                
+                // Maçı listeden kaldır
+                activeMatches = activeMatches.filter(m => m.id !== matchId);
+                updateMatchesDisplay();
+                
+            }, 2000);
         }
 
-        // Event Listeners
+        closeModalBtn.addEventListener('click', function() {
+            coinflipModal.style.display = 'none';
+        });
+
+        closeJoinMatchBtn.addEventListener('click', function() {
+            joinMatchModal.style.display = 'none';
+        });
+
+        // Item arama (join match)
+        joinItemSearch.addEventListener('input', function() {
+            const filteredItems = userInventory.filter(item => 
+                item.name.toLowerCase().includes(this.value.toLowerCase())
+            );
+            renderFilteredItemsForJoinMatch(filteredItems);
+        });
+
+        // Toplam value'yi güncelle
+        function updateTotalValue() {
+            const total = userInventory.reduce((sum, item) => sum + item.value, 0);
+            userBalance.textContent = total + ' Value';
+        }
+
+        // Profit gösterimini güncelle
+        function updateProfitDisplay() {
+            const profitText = totalProfit >= 0 ? `+${totalProfit} Profit` : `${totalProfit} Profit`;
+            const profitColor = totalProfit >= 0 ? '#4CAF50' : '#f44336';
+            userProfit.textContent = profitText;
+            userProfit.style.color = profitColor;
+        }
+
+        // Başarılı bildirim göster
+        function showSuccessNotification(message) {
+            successNotification.textContent = message;
+            successNotification.style.display = 'block';
+            setTimeout(() => {
+                successNotification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Maç oluşturma modalını aç
         createMatchBtn.addEventListener('click', function() {
             selectedItemsForMatch = [];
             selectedSideForMatch = null;
@@ -2057,48 +1835,39 @@
             createMatchModal.style.display = 'flex';
         });
 
-        closeCreateMatchBtn.addEventListener('click', function() {
-            createMatchModal.style.display = 'none';
+        // Item arama
+        itemSearch.addEventListener('input', function() {
+            filterItemsForMatchCreation(this.value);
         });
 
-        // Çıkış butonu
-        logoutBtn.addEventListener('click', function() {
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('userInventory');
-            appContainer.style.display = 'none';
-            loginContainer.style.display = 'block';
-            showStep(1);
-            usernameInput.value = '';
-            termsCheckbox.checked = false;
-            activeMatches = [];
-            currentUser = null;
-            userInventory = [];
-            updateTotalValue();
-        });
+        function filterItemsForMatchCreation(searchTerm) {
+            const filteredItems = userInventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            renderFilteredItemsForMatchCreation(filteredItems);
+        }
 
-        // Diğer fonksiyonlar
-        function loadInventoryForMatchCreation() {
+        function renderFilteredItemsForMatchCreation(filteredItems) {
             createMatchItems.innerHTML = '';
             
-            if (userInventory.length === 0) {
-                createMatchItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            if (filteredItems.length === 0) {
+                createMatchItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Item bulunamadı</div>';
                 return;
             }
             
-            userInventory.forEach(item => {
+            filteredItems.forEach(item => {
+                const isSelected = selectedItemsForMatch.some(selected => selected.id === item.id);
                 const itemElement = document.createElement('div');
-                itemElement.className = 'inventory-item';
+                itemElement.className = `inventory-item ${isSelected ? 'selected' : ''}`;
                 itemElement.innerHTML = `
                     <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/60x60/333/fff?text=?'">
                     </div>
                     <div class="item-name">${item.name}</div>
                     <div class="item-value">${item.value} Value</div>
                 `;
                 
                 itemElement.addEventListener('click', () => {
-                    // Item seçimi
-                    const isSelected = selectedItemsForMatch.some(selected => selected.id === item.id);
                     if (isSelected) {
                         selectedItemsForMatch = selectedItemsForMatch.filter(selected => selected.id !== item.id);
                         itemElement.classList.remove('selected');
@@ -2111,6 +1880,11 @@
                 
                 createMatchItems.appendChild(itemElement);
             });
+        }
+
+        function loadInventoryForMatchCreation() {
+            renderFilteredItemsForMatchCreation(userInventory);
+            itemSearch.value = '';
         }
 
         function updateCreateMatchPreview() {
@@ -2130,7 +1904,7 @@
                 const selectedItem = document.createElement('div');
                 selectedItem.className = 'selected-item';
                 selectedItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/40x40/333/fff?text=?'">
                     <div class="selected-item-info">
                         <div>${item.name}</div>
                         <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
@@ -2144,19 +1918,12 @@
             totalMatchValue.textContent = `Toplam Value: ${totalValue}`;
             confirmCreateMatchBtn.disabled = !selectedSideForMatch;
             
-            // Remove butonlarına event listener ekle
             selectedItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const itemId = parseInt(this.getAttribute('data-id'));
                     selectedItemsForMatch = selectedItemsForMatch.filter(item => item.id !== itemId);
                     updateCreateMatchPreview();
-                    
-                    // Grid'deki seçimi de kaldır
-                    createMatchItems.querySelectorAll('.inventory-item').forEach(invItem => {
-                        if (invItem.querySelector('.item-name').textContent === items.find(i => i.id === itemId)?.name) {
-                            invItem.classList.remove('selected');
-                        }
-                    });
+                    loadInventoryForMatchCreation();
                 });
             });
         }
@@ -2164,77 +1931,92 @@
         // Side seçimi
         document.querySelectorAll('.side-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedSideForMatch = this.getAttribute('data-side');
-                confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0;
+                // Sadece create match modalındaki butonları etkile
+                if (this.closest('#createMatchModal')) {
+                    document.querySelectorAll('#createMatchModal .side-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSideForMatch = this.getAttribute('data-side');
+                    confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0;
+                }
             });
         });
 
-        // Wallet butonu
-        walletBtn.addEventListener('click', function() {
-            showInventory();
-        });
-
-        function showInventory() {
-            inventoryItems.innerHTML = '';
-            
-            if (userInventory.length === 0) {
-                inventoryItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
-            } else {
-                userInventory.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'inventory-item';
-                    itemElement.innerHTML = `
-                        <div class="item-image">
-                            <img src="${item.image}" alt="${item.name}">
-                        </div>
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-value">${item.value} Value</div>
-                    `;
-                    
-                    itemElement.addEventListener('click', () => {
-                        showWithdrawModal(item);
-                    });
-                    
-                    inventoryItems.appendChild(itemElement);
+        // Maç oluşturma onayı
+        confirmCreateMatchBtn.addEventListener('click', async function() {
+            if (selectedItemsForMatch.length > 0 && selectedSideForMatch) {
+                const totalValue = selectedItemsForMatch.reduce((total, item) => total + item.value, 0);
+                
+                // Yeni maç oluştur
+                const newMatch = {
+                    id: Date.now(), // Basit ID oluşturma
+                    creator: currentUser,
+                    player2: null,
+                    items: [...selectedItemsForMatch],
+                    player2_items: null,
+                    side: selectedSideForMatch,
+                    totalValue: totalValue,
+                    pot: totalValue * 2,
+                    status: 'waiting'
+                };
+                
+                activeMatches.push(newMatch);
+                
+                // Seçilen itemleri envanterden kaldır
+                selectedItemsForMatch.forEach(item => {
+                    userInventory = userInventory.filter(invItem => invItem.id !== item.id);
                 });
+                
+                localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                updateTotalValue();
+                
+                showSuccessNotification("Maç başarıyla oluşturuldu!");
+                createMatchModal.style.display = 'none';
+                updateMatchesDisplay();
+                
+                // Modal kapandıktan sonra seçimleri sıfırla
+                setTimeout(() => {
+                    selectedItemsForMatch = [];
+                    selectedSideForMatch = null;
+                }, 500);
             }
-            
-            inventoryModal.style.display = 'flex';
+        });
+
+        closeCreateMatchBtn.addEventListener('click', function() {
+            createMatchModal.style.display = 'none';
+        });
+
+        // Diğer fonksiyonlar...
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step' + stepNumber).classList.add('active');
         }
 
-        function showWithdrawModal(item) {
-            selectedItemForWithdraw = item;
-            withdrawItemInfo.innerHTML = `
-                <div class="withdraw-item-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="withdraw-item-info">
-                    <div style="font-weight: bold;">${item.name}</div>
-                    <div style="color: #4CAF50;">${item.value} Value</div>
-                </div>
-            `;
-            withdrawModal.style.display = 'flex';
+        function showError(errorElement, message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
 
-        closeInventoryBtn.addEventListener('click', function() {
-            inventoryModal.style.display = 'none';
-        });
+        function hideError(errorElement) {
+            errorElement.style.display = 'none';
+        }
 
-        confirmWithdrawBtn.addEventListener('click', function() {
-            // Withdraw işlemi - şu anda yapım aşamasında
-            alert('Withdraw işlemi şu anda yapım aşamasında. Discord üzerinden moderatörle iletişime geçin.');
-            withdrawModal.style.display = 'none';
-            inventoryModal.style.display = 'none';
+        // Çıkış butonu
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userInventory');
+            localStorage.removeItem('totalProfit');
+            appContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            showStep(1);
+            usernameInput.value = '';
+            termsCheckbox.checked = false;
+            currentUser = null;
+            userInventory = [];
+            totalProfit = 0;
+            activeMatches = [];
         });
-
-        cancelWithdrawBtn.addEventListener('click', function() {
-            withdrawModal.style.display = 'none';
-        });
-
-        // İlk yükleme
-        updateTotalValue();
     </script>
 </body>
 </html>
