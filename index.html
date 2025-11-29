@@ -23,7 +23,67 @@ supabase
     }
   })
   .subscribe();
+
+// Supabase Backend Fonksiyonları
+class SupabaseBackend {
+  // Kullanıcı kayıt
+  static async registerUser(username) {
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ username, inventory: '[]' }])
+      .select();
+    
+    return { success: !error, user: data ? data[0] : null };
+  }
+
+  // Chat mesajı gönder
+  static async sendMessage(sender, message) {
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert([{ sender, message }]);
+    
+    return { success: !error };
+  }
+
+  // Yeni maç oluştur
+  static async createMatch(matchData) {
+    const { data, error } = await supabase
+      .from('matches')
+      .insert([matchData])
+      .select();
+    
+    return { success: !error, match: data ? data[0] : null };
+  }
+
+  // Tüm maçları getir
+  static async getMatches() {
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    return error ? [] : data;
+  }
+
+  // Maça katıl
+  static async joinMatch(matchId, playerData) {
+    const { error } = await supabase
+      .from('matches')
+      .update({ 
+        player2: playerData.username,
+        player2_items: JSON.stringify(playerData.items),
+        status: 'active'
+      })
+      .eq('id', matchId);
+    
+    return { success: !error };
+  }
+}
+
+// Eski BackendAPI yerine bunu kullan
+const BackendAPI = SupabaseBackend;
 </script>
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -998,9 +1058,34 @@ supabase
             font-size: 14px;
             margin: 10px 0;
         }
+
+        /* Bağlantı Durumu */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+        
+        .connection-status.connected {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .connection-status.disconnected {
+            background: #f44336;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- Bağlantı Durumu -->
+    <div class="connection-status disconnected" id="connectionStatus">🔴 Çevrimdışı</div>
+
     <!-- Giriş Sayfası -->
     <div class="container" id="loginContainer" style="max-width: 450px; margin: 50px auto;">
         <div class="logo">
@@ -1253,6 +1338,7 @@ supabase
         const cancelTipBtn = document.getElementById('cancelTipBtn');
         const totalTipValue = document.getElementById('totalTipValue');
         const allItemsGrid = document.getElementById('allItemsGrid');
+        const connectionStatus = document.getElementById('connectionStatus');
         
         // Değişkenler
         let currentUser = null;
@@ -1465,14 +1551,21 @@ supabase
         });
 
         // Ana uygulamayı göster
-        function showMainApp() {
+        async function showMainApp() {
             loginContainer.style.display = 'none';
             appContainer.style.display = 'flex';
             coinflipContainer.style.display = 'flex';
             coinflipUsername.textContent = currentUser;
+            
+            // Mevcut maçları yükle
+            const matches = await BackendAPI.getMatches();
+            activeMatches = matches;
             updateMatchesDisplay();
             
-            // Tüm itemleri tip modalı için yükle
+            // Bağlantı durumunu güncelle
+            connectionStatus.textContent = '🟢 Çevrimiçi';
+            connectionStatus.className = 'connection-status connected';
+            
             loadAllItemsForTip();
         }
         
@@ -1492,6 +1585,10 @@ supabase
             currentUser = null;
             userInventory = [];
             updateTotalValue();
+            
+            // Bağlantı durumunu güncelle
+            connectionStatus.textContent = '🔴 Çevrimdışı';
+            connectionStatus.className = 'connection-status disconnected';
         });
         
         // Wallet butonu tıklama olayı
@@ -1888,7 +1985,7 @@ supabase
         // Maç için tip modalını göster
         function showTipModalForMatch(match) {
             selectedItemsForTip = [];
-            tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+            tipItemsPreview.innerHTML = '';
             totalTipValue.textContent = 'Toplam Value: 0';
             tipUsername.value = match.creator;
             tipUsername.disabled = true;
@@ -2193,4 +2290,3 @@ supabase
     </script>
 </body>
 </html>
-
