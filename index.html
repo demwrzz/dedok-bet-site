@@ -1366,102 +1366,6 @@
         let selectedItemsForTip = [];
         let users = {};
 
-        // Real-time dinleyicileri başlat
-        function initializeRealtimeListeners() {
-            console.log('Real-time dinleyiciler başlatılıyor...');
-            
-            // Chat mesajları için real-time dinleyici
-            supabase
-                .channel('public:chat_messages')
-                .on('postgres_changes', 
-                    { 
-                        event: 'INSERT', 
-                        schema: 'public', 
-                        table: 'chat_messages' 
-                    }, 
-                    (payload) => {
-                        console.log('Yeni mesaj geldi:', payload);
-                        addChatMessage(payload.new.sender, payload.new.message);
-                    }
-                )
-                .subscribe();
-
-            // Maçlar için real-time dinleyici
-            supabase
-                .channel('public:matchlist')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'matchlist' 
-                    }, 
-                    (payload) => {
-                        console.log('Maç değişikliği:', payload);
-                        handleMatchChange(payload);
-                    }
-                )
-                .subscribe();
-        }
-
-        // Maç değişikliklerini işle
-        function handleMatchChange(payload) {
-            if (payload.eventType === 'INSERT') {
-                // Yeni maç eklendi
-                const newMatch = {
-                    ...payload.new,
-                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
-                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
-                };
-                
-                if (!activeMatches.some(m => m.id === newMatch.id)) {
-                    activeMatches.push(newMatch);
-                    updateMatchesDisplay();
-                    addChatMessage("Sistem", `${newMatch.creator} yeni bir CoinFlip maçı oluşturdu!`);
-                }
-            } else if (payload.eventType === 'UPDATE') {
-                // Maç güncellendi
-                const updatedMatch = {
-                    ...payload.new,
-                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
-                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
-                };
-                
-                const index = activeMatches.findIndex(m => m.id === updatedMatch.id);
-                if (index !== -1) {
-                    activeMatches[index] = updatedMatch;
-                    updateMatchesDisplay();
-                    
-                    if (updatedMatch.player2 && !payload.old.player2) {
-                        addChatMessage("Sistem", `${updatedMatch.player2} ${updatedMatch.creator}'ın maçına katıldı!`);
-                    }
-                }
-            } else if (payload.eventType === 'DELETE') {
-                // Maç silindi
-                activeMatches = activeMatches.filter(m => m.id !== payload.old.id);
-                updateMatchesDisplay();
-            }
-        }
-
-        // Chat mesajı ekle
-        function addChatMessage(sender, message) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message';
-            messageElement.innerHTML = `<span class="sender">${sender}:</span> ${message}`;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Sayfa yüklendiğinde oturum kontrolü
-        document.addEventListener('DOMContentLoaded', async function() {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = savedUser;
-                userInventory = JSON.parse(localStorage.getItem('userInventory')) || [];
-                
-                await showMainApp();
-            }
-        });
-
         // Item tanımları
         const items = [
             {
@@ -1567,7 +1471,109 @@
                 image: "https://tr.rbxcdn.com/180DAY-d321727e99eb67e54c746a2c310b0472/420/420/Model/Png/noFilter"
             }
         ];
-        
+
+        // Real-time dinleyicileri başlat
+        function initializeRealtimeListeners() {
+            console.log('Real-time dinleyiciler başlatılıyor...');
+            
+            // Chat mesajları için real-time dinleyici
+            supabase
+                .channel('public:chat_messages')
+                .on('postgres_changes', 
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'chat_messages' 
+                    }, 
+                    (payload) => {
+                        console.log('Yeni mesaj geldi:', payload);
+                        addChatMessage(payload.new.sender, payload.new.message);
+                    }
+                )
+                .subscribe();
+
+            // Maçlar için real-time dinleyici
+            supabase
+                .channel('public:matchlist')
+                .on('postgres_changes', 
+                    { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'matchlist' 
+                    }, 
+                    (payload) => {
+                        console.log('Maç değişikliği:', payload);
+                        handleMatchChange(payload);
+                    }
+                )
+                .subscribe();
+        }
+
+        // Maç değişikliklerini işle
+        function handleMatchChange(payload) {
+            if (payload.eventType === 'INSERT') {
+                // Yeni maç eklendi
+                const newMatch = {
+                    ...payload.new,
+                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
+                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
+                };
+                
+                if (!activeMatches.some(m => m.id === newMatch.id)) {
+                    activeMatches.push(newMatch);
+                    updateMatchesDisplay();
+                    addChatMessage("Sistem", `${newMatch.creator} yeni bir CoinFlip maçı oluşturdu!`);
+                }
+            } else if (payload.eventType === 'UPDATE') {
+                // Maç güncellendi
+                const updatedMatch = {
+                    ...payload.new,
+                    items: payload.new.items ? JSON.parse(payload.new.items) : [],
+                    player2_items: payload.new.player2_items ? JSON.parse(payload.new.player2_items) : null
+                };
+                
+                const index = activeMatches.findIndex(m => m.id === updatedMatch.id);
+                if (index !== -1) {
+                    activeMatches[index] = updatedMatch;
+                    updateMatchesDisplay();
+                    
+                    if (updatedMatch.player2 && !payload.old.player2) {
+                        addChatMessage("Sistem", `${updatedMatch.player2} ${updatedMatch.creator}'ın maçına katıldı!`);
+                    }
+                }
+            } else if (payload.eventType === 'DELETE') {
+                // Maç silindi
+                activeMatches = activeMatches.filter(m => m.id !== payload.old.id);
+                updateMatchesDisplay();
+            }
+        }
+
+        // Chat mesajı ekle
+        function addChatMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = `<span class="sender">${sender}:</span> ${message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Sayfa yüklendiğinde oturum kontrolü
+        document.addEventListener('DOMContentLoaded', async function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                userInventory = JSON.parse(localStorage.getItem('userInventory')) || [];
+                
+                // Eğer envanter boşsa, tüm itemleri ekle
+                if (userInventory.length === 0) {
+                    userInventory = [...items];
+                    localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                }
+                
+                await showMainApp();
+            }
+        });
+
         // Giriş butonu tıklama olayı
         loginBtn.addEventListener('click', function() {
             const username = usernameInput.value.trim();
@@ -1618,7 +1624,9 @@
             
             // Başarılı giriş
             currentUser = usernameInput.value.trim();
-            userInventory = [];
+            
+            // Yeni kullanıcıya tüm itemleri ekle
+            userInventory = [...items];
             
             localStorage.setItem('currentUser', currentUser);
             localStorage.setItem('userInventory', JSON.stringify(userInventory));
@@ -1653,6 +1661,10 @@
                 connectionStatus.textContent = '🟢 Çevrimiçi';
                 connectionStatus.className = 'connection-status connected';
                 
+                // Toplam value'yi güncelle
+                updateTotalValue();
+                
+                // Tüm itemleri tip modalı için yükle
                 loadAllItemsForTip();
                 
                 console.log('Uygulama başlatıldı:', { currentUser, matchesCount: activeMatches.length });
