@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dedok Bet - CoinFlip</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #e52e71;
+            box-shadow: 0 0 0 2px rgba(229, 46, 113, 0.2);
+        }
+        
+        input[type="text"]::placeholder {
+            color: #aaa;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .checkbox-group label {
+            font-size: 14px;
+            color: #ddd;
+            line-height: 1.4;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 46, 113, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .verification-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .verification-code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 15px 0;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border: 1px dashed #ff8a00;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .success-message h2 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+        
+        /* CoinFlip Sayfası Stilleri */
+        .coinflip-container {
+            width: 100%;
+            max-width: 800px;
+            display: none;
+        }
+        
+        .coinflip-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .coinflip-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .coinflip-header p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        
+        .balance-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .balance-card h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .matches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .match-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(229, 46, 113, 0.5);
+        }
+        
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .match-id {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .match-pot {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff8a00;
+        }
+        
+        .players {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .player {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .player-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #ddd;
+        }
+        
+        .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            overflow: hidden;
+        }
+        
+        .player-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .player-bet {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .join-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .join-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .join-btn:hover:not(:disabled) {
+            background: linear-gradient(90deg, #66BB6A, #388E3C);
+        }
+        
+        .cancel-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+        }
+        
+        .cancel-btn:hover {
+            background: linear-gradient(90deg, #ef5350, #e53935);
+        }
+        
+        .create-match {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .create-btn {
+            padding: 12px 30px;
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .user-welcome {
+            font-size: 18px;
+        }
+        
+        .logout-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Chat Sistemi */
+        .chat-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .chat-message .sender {
+            font-weight: bold;
+            color: #ff8a00;
+            margin-right: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* CoinFlip Animasyonu */
+        .coinflip-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .coinflip-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .coin {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .coin .front, .coin .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .coin .front {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+        
+        .coin .back {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            transform: rotateY(180deg);
+        }
+        
+        .flipping {
+            animation: flip 2s infinite;
+        }
+        
+        @keyframes flip {
+            0% { transform: rotateY(0); }
+            50% { transform: rotateY(1800deg); }
+            100% { transform: rotateY(3600deg); }
+        }
+        
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .winner {
+            color: #4CAF50;
+        }
+        
+        .loser {
+            color: #f44336;
+        }
+        
+        .no-matches {
+            text-align: center;
+            padding: 30px;
+            color: #aaa;
+        }
+        
+        /* Envanter Modal */
+        .inventory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .inventory-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .inventory-header h2 {
+            font-size: 24px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .inventory-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .inventory-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .inventory-item.selected {
+            border-color: #ff8a00;
+        }
+        
+        .item-image {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .item-value {
+            color: #4CAF50;
+            font-size: 14px;
+        }
+        
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .top-btn {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .top-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Withdraw Modal */
+        .withdraw-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .withdraw-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .withdraw-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .withdraw-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .withdraw-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .withdraw-item-info {
+            text-align: left;
+        }
+        
+        .withdraw-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .withdraw-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .withdraw-confirm {
+            background: #4CAF50;
+        }
+        
+        .withdraw-cancel {
+            background: #f44336;
+        }
+        
+        /* Create Match Modal */
+        .create-match-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .create-match-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .selected-items-preview {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .selected-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .selected-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .selected-item-info {
+            flex: 1;
+        }
+        
+        .remove-item {
+            background: #f44336;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .no-item-selected {
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+        
+        .side-selection {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .side-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .side-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .side-btn.selected {
+            border-color: #ff8a00;
+            background: rgba(255, 138, 0, 0.2);
+        }
+        
+        .side-btn.heads {
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+        }
+        
+        .side-btn.tails {
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+        }
+        
+        .total-value {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        /* Tip Modal */
+        .tip-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .tip-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .tip-form {
+            margin: 20px 0;
+        }
+        
+        .tip-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .tip-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tip-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .tip-confirm {
+            background: #4CAF50;
+        }
+        
+        .tip-cancel {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <!-- Giriş Sayfası -->
+    <div class="container" id="loginContainer">
+        <div class="logo">
+            <h1>Dedok Bet</h1>
+            <p>Giriş yaparak, en az 18 yaşında olduğunuzu, bahis yaptığınız öğelerin çalıntı olmadığını ve Kullanım Şartlarımızı kabul ettiğinizi onaylamış olursunuz.</p>
+        </div>
+        
+        <!-- Adım 1: Kullanıcı Adı Girişi -->
+        <div class="step active" id="step1">
+            <div class="form-group">
+                <label for="username">Roblox Kullanıcı Adı</label>
+                <input type="text" id="username" placeholder="Roblox kullanıcı adınızı girin...">
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms">
+                <label for="terms">Bu kutuyu işaretleyerek şartlar ve hizmetlerimizi kabul etmiş olursunuz</label>
+            </div>
+            
+            <button class="btn" id="loginBtn">Giriş Yap</button>
+            <div class="error-message" id="step1Error"></div>
+        </div>
+        
+        <!-- Adım 2: Doğrulama Kodu Girişi -->
+        <div class="step" id="step2">
+            <button class="btn back-button" id="backBtn">← Geri</button>
+            
+            <div class="verification-info">
+                <p><strong id="usernameDisplay"></strong> kullanıcı adı için doğrulama gerekiyor.</p>
+                <p>Lütfen aşağıdaki kodu kopyalayıp Roblox profil açıklamanıza yapıştırın:</p>
+                <div class="verification-code" id="verificationCodeDisplay">Yükleniyor...</div>
+                <p>Kodu açıklamanıza ekledikten sonra aşağıdaki butona tıklayın.</p>
+            </div>
+            
+            <button class="btn" id="verifyBtn">Doğrulamayı Tamamladım</button>
+            <div class="error-message" id="step2Error"></div>
+        </div>
+    </div>
+
+    <!-- CoinFlip Sayfası -->
+    <div class="container coinflip-container" id="coinflipContainer">
+        <div class="coinflip-header">
+            <h1>Dedok Bet - CoinFlip</h1>
+            <p>Risk al, kazançları topla! %50 şans ile paranı ikiye katla.</p>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-welcome">Hoş geldin, <strong id="coinflipUsername"></strong>!</div>
+            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
+        </div>
+        
+        <div class="top-buttons">
+            <button class="top-btn" id="walletBtn">💰 Wallet</button>
+        </div>
+        
+        <div class="balance-card">
+            <div>
+                <h3>Toplam Value</h3>
+                <div class="balance-amount" id="userBalance">0 Value</div>
+            </div>
+        </div>
+        
+        <h2 style="margin-bottom: 15px;">Aktif Maçlar</h2>
+        <div class="matches-container" id="matchesContainer">
+            <div class="no-matches" id="noMatchesMessage">
+                Henüz aktif maç bulunmuyor. İlk maçı siz oluşturun!
+            </div>
+        </div>
+        
+        <div class="create-match">
+            <button class="create-btn" id="createMatchBtn">Yeni Maç Oluştur</button>
+        </div>
+        
+        <!-- Chat Sistemi -->
+        <div class="chat-container">
+            <div class="chat-header">Genel Sohbet</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message">
+                    <span class="sender">Sistem:</span> Sohbete hoş geldiniz! /tip [kullanıcı] [item] komutu ile item gönderebilirsiniz.
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+                <button id="sendMessageBtn">Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CoinFlip Animasyon Modal -->
+    <div class="coinflip-modal" id="coinflipModal">
+        <div class="coinflip-content">
+            <h2>CoinFlip</h2>
+            <div class="coin" id="coin">
+                <div class="front">HEADS</div>
+                <div class="back">TAILS</div>
+            </div>
+            <div class="result" id="coinflipResult"></div>
+            <button class="btn" id="closeModalBtn" style="margin-top: 20px;">Kapat</button>
+        </div>
+    </div>
+
+    <!-- Envanter Modal -->
+    <div class="inventory-modal" id="inventoryModal">
+        <div class="inventory-content">
+            <div class="inventory-header">
+                <h2>Envanterim</h2>
+                <button class="close-btn" id="closeInventoryBtn">×</button>
+            </div>
+            <div class="inventory-items" id="inventoryItems">
+                <!-- Itemler buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="withdraw-modal" id="withdrawModal">
+        <div class="withdraw-content">
+            <h2>Item'i Withdraw Et</h2>
+            <div class="withdraw-item" id="withdrawItemInfo">
+                <!-- Item bilgisi buraya eklenecek -->
+            </div>
+            <p>Bu item'i withdraw etmek istediğinizden emin misiniz?</p>
+            <p style="color: #ff8a00; margin: 10px 0;">Şu anda yapım aşamasında. Discord üzerinden moderatörle iletişime geçin.</p>
+            <div class="withdraw-buttons">
+                <button class="withdraw-confirm" id="confirmWithdrawBtn">Evet</button>
+                <button class="withdraw-cancel" id="cancelWithdrawBtn">Hayır</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Match Modal -->
+    <div class="create-match-modal" id="createMatchModal">
+        <div class="create-match-content">
+            <div class="inventory-header">
+                <h2>Maç İçin Item Seçin</h2>
+                <button class="close-btn" id="closeCreateMatchBtn">×</button>
+            </div>
+            
+            <div class="selected-items-preview" id="selectedItemsPreview">
+                <div class="no-item-selected">Henüz item seçilmedi</div>
+            </div>
+            
+            <div class="total-value" id="totalMatchValue">Toplam Value: 0</div>
+            
+            <div class="side-selection">
+                <h3>Heads or Tails Seçin</h3>
+                <div class="side-buttons">
+                    <button class="side-btn heads" data-side="heads">HEADS</button>
+                    <button class="side-btn tails" data-side="tails">TAILS</button>
+                </div>
+            </div>
+            
+            <div class="inventory-items" id="createMatchItems">
+                <!-- Itemler buraya eklenecek -->
+            </div>
+            
+            <button class="btn" id="confirmCreateMatchBtn" style="margin-top: 20px;" disabled>Maçı Oluştur</button>
+        </div>
+    </div>
+
+    <!-- Tip Modal -->
+    <div class="tip-modal" id="tipModal">
+        <div class="tip-content">
+            <div class="inventory-header">
+                <h2>Item Gönder</h2>
+                <button class="close-btn" id="closeTipBtn">×</button>
+            </div>
+            
+            <div class="tip-form">
+                <input type="text" id="tipUsername" placeholder="Kullanıcı adı">
+                <div class="selected-items-preview" id="tipItemsPreview">
+                    <div class="no-item-selected">Henüz item seçilmedi</div>
+                </div>
+                <div class="total-value" id="totalTipValue">Toplam Value: 0</div>
+            </div>
+            
+            <div class="inventory-items" id="tipItems">
+                <!-- Itemler buraya eklenecek -->
+            </div>
+            
+            <div class="tip-buttons">
+                <button class="tip-confirm" id="confirmTipBtn">Gönder</button>
+                <button class="tip-cancel" id="cancelTipBtn">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elementleri
+        const loginContainer = document.getElementById('loginContainer');
+        const coinflipContainer = document.getElementById('coinflipContainer');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const usernameInput = document.getElementById('username');
+        const termsCheckbox = document.getElementById('terms');
+        const loginBtn = document.getElementById('loginBtn');
+        const backBtn = document.getElementById('backBtn');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const verificationCodeDisplay = document.getElementById('verificationCodeDisplay');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const coinflipUsername = document.getElementById('coinflipUsername');
+        const step1Error = document.getElementById('step1Error');
+        const step2Error = document.getElementById('step2Error');
+        const matchesContainer = document.getElementById('matchesContainer');
+        const noMatchesMessage = document.getElementById('noMatchesMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const createMatchBtn = document.getElementById('createMatchBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const coinflipModal = document.getElementById('coinflipModal');
+        const coin = document.getElementById('coin');
+        const coinflipResult = document.getElementById('coinflipResult');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const walletBtn = document.getElementById('walletBtn');
+        const inventoryModal = document.getElementById('inventoryModal');
+        const closeInventoryBtn = document.getElementById('closeInventoryBtn');
+        const inventoryItems = document.getElementById('inventoryItems');
+        const withdrawModal = document.getElementById('withdrawModal');
+        const withdrawItemInfo = document.getElementById('withdrawItemInfo');
+        const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
+        const cancelWithdrawBtn = document.getElementById('cancelWithdrawBtn');
+        const createMatchModal = document.getElementById('createMatchModal');
+        const closeCreateMatchBtn = document.getElementById('closeCreateMatchBtn');
+        const createMatchItems = document.getElementById('createMatchItems');
+        const selectedItemsPreview = document.getElementById('selectedItemsPreview');
+        const confirmCreateMatchBtn = document.getElementById('confirmCreateMatchBtn');
+        const userBalance = document.getElementById('userBalance');
+        const totalMatchValue = document.getElementById('totalMatchValue');
+        const tipModal = document.getElementById('tipModal');
+        const closeTipBtn = document.getElementById('closeTipBtn');
+        const tipItems = document.getElementById('tipItems');
+        const tipItemsPreview = document.getElementById('tipItemsPreview');
+        const tipUsername = document.getElementById('tipUsername');
+        const confirmTipBtn = document.getElementById('confirmTipBtn');
+        const cancelTipBtn = document.getElementById('cancelTipBtn');
+        const totalTipValue = document.getElementById('totalTipValue');
+        
+        // Değişkenler
+        let currentUser = null;
+        let verificationCode = '';
+        let activeMatches = [];
+        let matchIdCounter = 1;
+        let userInventory = [];
+        let selectedItemForWithdraw = null;
+        let selectedItemsForMatch = [];
+        let selectedSideForMatch = null;
+        let selectedItemsForTip = [];
+        let users = {};
+        
+        // Item tanımları
+        const items = [
+            {
+                id: 1,
+                name: "Corrupt",
+                value: 825,
+                image: "https://tr.rbxcdn.com/180DAY-f3a3fda528c91ef9357361df1c14d5fb/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 2,
+                name: "C Vampires Gun",
+                value: 23000,
+                image: "https://tr.rbxcdn.com/180DAY-7ecc9d172ad05caf211e515471893d29/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 3,
+                name: "Travellers Gun",
+                value: 4100,
+                image: "https://tr.rbxcdn.com/180DAY-950f9412ff516bbea7459c4ba504d4a2/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 4,
+                name: "Evergun",
+                value: 3000,
+                image: "https://tr.rbxcdn.com/180DAY-50bb023f54e8dbae44aa4b02d61ce050/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 5,
+                name: "Sugar",
+                value: 70,
+                image: "https://tr.rbxcdn.com/180DAY-fc538eca64fbe088a13c8ce66e47a0a2/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 6,
+                name: "Vampires Gun",
+                value: 2000,
+                image: "https://tr.rbxcdn.com/180DAY-a132d04b779839721744cd1f31c2ec39/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 7,
+                name: "Harvester",
+                value: 450,
+                image: "https://tr.rbxcdn.com/180DAY-67a3a4b144ccf57f1bbdafe8fa27a08a/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 8,
+                name: "Sakura",
+                value: 895,
+                image: "https://tr.rbxcdn.com/180DAY-f1d1285a9c3c4de680df8a5ae9fe2af9/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 9,
+                name: "Icepiercer",
+                value: 325,
+                image: "https://tr.rbxcdn.com/180DAY-6213a4bb141ead4f941b11a0f93fd44a/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 10,
+                name: "Chroma Saw",
+                value: 40,
+                image: "https://tr.rbxcdn.com/180DAY-ffd5ea6a2617d24536ff6adf87c0bbd1/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 11,
+                name: "Candy",
+                value: 170,
+                image: "https://tr.rbxcdn.com/180DAY-2007a4c9c774eb21534ed011ae6e36b2/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 12,
+                name: "Chroma Gemstone",
+                value: 45,
+                image: "https://tr.rbxcdn.com/180DAY-cd9724ce67d6854fdd9dc219eb3e0ac2/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 13,
+                name: "Chroma Heat",
+                value: 45,
+                image: "https://tr.rbxcdn.com/180DAY-292d5d05d6c42cb1f413b2b8ab2be5e1/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 14,
+                name: "Chroma Seer",
+                value: 45,
+                image: "https://tr.rbxcdn.com/180DAY-468b0f806c05652ed9b7a3a09a45edc0/420/420/Image/Png/noFilter"
+            },
+            {
+                id: 15,
+                name: "Chroma Boneblade",
+                value: 40,
+                image: "https://tr.rbxcdn.com/180DAY-c0b2f2255317bee86c95e70626ee2aa5/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 16,
+                name: "Rainbow Gun",
+                value: 250,
+                image: "https://tr.rbxcdn.com/180DAY-4644f803d4c1171db843b608d8692354/420/420/Model/Png/noFilter"
+            },
+            {
+                id: 17,
+                name: "Flowerwood Gun",
+                value: 150,
+                image: "https://tr.rbxcdn.com/180DAY-d321727e99eb67e54c746a2c310b0472/420/420/Model/Png/noFilter"
+            }
+        ];
+        
+        // Giriş butonu tıklama olayı
+        loginBtn.addEventListener('click', function() {
+            const username = usernameInput.value.trim();
+            
+            // Doğrulamalar
+            if (!username) {
+                showError(step1Error, "Lütfen Roblox kullanıcı adınızı girin.");
+                return;
+            }
+            
+            if (!termsCheckbox.checked) {
+                showError(step1Error, "Devam etmek için şartları kabul etmelisiniz.");
+                return;
+            }
+            
+            // Hata mesajını temizle
+            hideError(step1Error);
+            
+            // Kullanıcı adını göster ve doğrulama kodu oluştur
+            usernameDisplay.textContent = username;
+            generateVerificationCode();
+            showStep(2);
+        });
+        
+        // Doğrulama kodu oluşturma
+        function generateVerificationCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            verificationCode = code;
+            verificationCodeDisplay.textContent = code;
+        }
+        
+        // Geri butonu tıklama olayı
+        backBtn.addEventListener('click', function() {
+            showStep(1);
+        });
+        
+        // Doğrulama butonu tıklama olayı
+        verifyBtn.addEventListener('click', function() {
+            // Gerçek uygulamada burada Roblox API ile açıklama kontrolü yapılmalı
+            // Bu örnekte doğrulamayı atlıyoruz
+            
+            // Hata mesajını temizle
+            hideError(step2Error);
+            
+            // Başarılı giriş
+            currentUser = usernameInput.value.trim();
+            
+            // Kullanıcıyı kaydet (ilk girişte 0 bakiye)
+            if (!users[currentUser]) {
+                users[currentUser] = {
+                    username: currentUser,
+                    inventory: [],
+                    totalValue: 0
+                };
+            }
+            
+            // Kullanıcı bilgilerini yükle
+            userInventory = [...users[currentUser].inventory];
+            updateTotalValue();
+            
+            // CoinFlip sayfasına yönlendirme
+            loginContainer.style.display = 'none';
+            coinflipContainer.style.display = 'block';
+            coinflipUsername.textContent = currentUser;
+            updateMatchesDisplay();
+        });
+        
+        // Çıkış butonu tıklama olayı
+        logoutBtn.addEventListener('click', function() {
+            coinflipContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            showStep(1);
+            // Formu sıfırla
+            usernameInput.value = '';
+            termsCheckbox.checked = false;
+            activeMatches = [];
+            currentUser = null;
+            userInventory = [];
+            updateTotalValue();
+        });
+        
+        // Wallet butonu tıklama olayı
+        walletBtn.addEventListener('click', function() {
+            showInventory();
+        });
+        
+        // Envanteri göster
+        function showInventory() {
+            inventoryItems.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                inventoryItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            } else {
+                userInventory.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-value">${item.value} Value</div>
+                    `;
+                    
+                    itemElement.addEventListener('click', function() {
+                        // Tüm itemlerin seçimini kaldır
+                        document.querySelectorAll('.inventory-item').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        
+                        // Bu itemi seç
+                        itemElement.classList.add('selected');
+                        selectedItemForWithdraw = item;
+                        
+                        // Withdraw modalını göster
+                        showWithdrawModal(item);
+                    });
+                    
+                    inventoryItems.appendChild(itemElement);
+                });
+            }
+            
+            inventoryModal.style.display = 'flex';
+        }
+        
+        // Withdraw modalını göster
+        function showWithdrawModal(item) {
+            withdrawItemInfo.innerHTML = `
+                <div class="withdraw-item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="withdraw-item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-value">${item.value} Value</div>
+                </div>
+            `;
+            
+            withdrawModal.style.display = 'flex';
+        }
+        
+        // Withdraw onaylama
+        confirmWithdrawBtn.addEventListener('click', function() {
+            if (selectedItemForWithdraw) {
+                // Item'i envanterden kaldır
+                userInventory = userInventory.filter(item => item.id !== selectedItemForWithdraw.id);
+                users[currentUser].inventory = userInventory;
+                updateTotalValue();
+                
+                // Modal'ları kapat
+                withdrawModal.style.display = 'none';
+                inventoryModal.style.display = 'none';
+                
+                // Envanteri güncelle
+                showInventory();
+                
+                alert("Item withdraw edildi! Discord üzerinden moderatörle iletişime geçin.");
+            }
+        });
+        
+        // Withdraw iptal
+        cancelWithdrawBtn.addEventListener('click', function() {
+            withdrawModal.style.display = 'none';
+            selectedItemForWithdraw = null;
+            
+            // Tüm itemlerin seçimini kaldır
+            document.querySelectorAll('.inventory-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+        });
+        
+        // Envanter modal kapatma
+        closeInventoryBtn.addEventListener('click', function() {
+            inventoryModal.style.display = 'none';
+            selectedItemForWithdraw = null;
+        });
+        
+        // Yeni maç oluştur butonu
+        createMatchBtn.addEventListener('click', function() {
+            showCreateMatchModal();
+        });
+        
+        // Maç oluşturma modalını göster
+        function showCreateMatchModal() {
+            createMatchItems.innerHTML = '';
+            selectedItemsForMatch = [];
+            selectedSideForMatch = null;
+            selectedItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+            totalMatchValue.textContent = 'Toplam Value: 0';
+            confirmCreateMatchBtn.disabled = true;
+            
+            // Side seçim butonlarını sıfırla
+            document.querySelectorAll('.side-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            if (userInventory.length === 0) {
+                createMatchItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            } else {
+                userInventory.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-value">${item.value} Value</div>
+                    `;
+                    
+                    itemElement.addEventListener('click', function() {
+                        // Item zaten seçili mi kontrol et
+                        const existingIndex = selectedItemsForMatch.findIndex(selected => selected.id === item.id);
+                        
+                        if (existingIndex !== -1) {
+                            // Item zaten seçili, kaldır
+                            selectedItemsForMatch.splice(existingIndex, 1);
+                            itemElement.classList.remove('selected');
+                        } else {
+                            // Item seçili değil, ekle
+                            selectedItemsForMatch.push(item);
+                            itemElement.classList.add('selected');
+                        }
+                        
+                        // Seçilen itemleri güncelle
+                        updateSelectedItemsPreview(selectedItemsPreview, selectedItemsForMatch, totalMatchValue);
+                        
+                        // Maç oluştur butonunu aktif et
+                        confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0 || selectedSideForMatch === null;
+                    });
+                    
+                    createMatchItems.appendChild(itemElement);
+                });
+            }
+            
+            // Side seçim butonları
+            document.querySelectorAll('.side-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSideForMatch = this.dataset.side;
+                    confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0;
+                });
+            });
+            
+            createMatchModal.style.display = 'flex';
+        }
+        
+        // Seçilen itemleri güncelle
+        function updateSelectedItemsPreview(container, items, totalElement) {
+            if (items.length === 0) {
+                container.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+                totalElement.textContent = 'Toplam Value: 0';
+                return;
+            }
+            
+            container.innerHTML = '';
+            let totalValue = 0;
+            
+            items.forEach(item => {
+                totalValue += item.value;
+                const itemElement = document.createElement('div');
+                itemElement.className = 'selected-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="selected-item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-value">${item.value} Value</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                `;
+                container.appendChild(itemElement);
+            });
+            
+            totalElement.textContent = `Toplam Value: ${totalValue}`;
+            
+            // Kaldır butonlarına event listener ekle
+            container.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.id);
+                    selectedItemsForMatch = selectedItemsForMatch.filter(item => item.id !== itemId);
+                    
+                    // Item seçimini kaldır
+                    document.querySelectorAll('#createMatchItems .inventory-item').forEach(el => {
+                        if (parseInt(el.querySelector('.item-name').textContent) === itemId) {
+                            el.classList.remove('selected');
+                        }
+                    });
+                    
+                    updateSelectedItemsPreview(container, selectedItemsForMatch, totalElement);
+                    confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0 || selectedSideForMatch === null;
+                });
+            });
+        }
+        
+        // Maç oluşturma onayı
+        confirmCreateMatchBtn.addEventListener('click', function() {
+            if (selectedItemsForMatch.length > 0 && selectedSideForMatch) {
+                const totalValue = selectedItemsForMatch.reduce((total, item) => total + item.value, 0);
+                
+                const newMatch = {
+                    id: "CF-" + matchIdCounter++,
+                    creator: currentUser,
+                    player2: null,
+                    items: [...selectedItemsForMatch],
+                    side: selectedSideForMatch,
+                    totalValue: totalValue,
+                    pot: totalValue * 2
+                };
+                activeMatches.push(newMatch);
+                updateMatchesDisplay();
+                addChatMessage("Sistem", `${currentUser} ${totalValue} Value'lik yeni bir CoinFlip maçı oluşturdu!`);
+                
+                // Seçilen itemleri envanterden kaldır
+                selectedItemsForMatch.forEach(item => {
+                    userInventory = userInventory.filter(invItem => invItem.id !== item.id);
+                });
+                users[currentUser].inventory = userInventory;
+                updateTotalValue();
+                
+                // Modal'ı kapat
+                createMatchModal.style.display = 'none';
+            }
+        });
+        
+        // Maç oluşturma modal kapatma
+        closeCreateMatchBtn.addEventListener('click', function() {
+            createMatchModal.style.display = 'none';
+        });
+        
+        // Toplam value'yu güncelle
+        function updateTotalValue() {
+            const totalValue = userInventory.reduce((total, item) => total + item.value, 0);
+            userBalance.textContent = totalValue.toLocaleString() + ' Value';
+            users[currentUser].totalValue = totalValue;
+        }
+        
+        // Maçları güncelleme
+        function updateMatchesDisplay() {
+            matchesContainer.innerHTML = '';
+            
+            if (activeMatches.length === 0) {
+                noMatchesMessage.style.display = 'block';
+                return;
+            }
+            
+            noMatchesMessage.style.display = 'none';
+            
+            activeMatches.forEach(match => {
+                const matchCard = document.createElement('div');
+                matchCard.className = 'match-card';
+                
+                const isCreator = match.creator === currentUser;
+                const canJoin = !isCreator && match.player2 === null;
+                
+                // İlk itemin resmini göster
+                const firstItem = match.items[0];
+                
+                matchCard.innerHTML = `
+                    <div class="match-header">
+                        <div class="match-id">${match.id}</div>
+                        <div class="match-pot">${match.pot} Value</div>
+                    </div>
+                    <div class="players">
+                        <div class="player">
+                            <div class="player-avatar">
+                                <img src="${firstItem.image}" alt="${firstItem.name}">
+                            </div>
+                            <div class="player-name">${match.creator}</div>
+                            <div class="player-bet">${match.items.length} Item</div>
+                            <div class="player-bet">${match.side === 'heads' ? 'HEADS' : 'TAILS'}</div>
+                        </div>
+                        <div class="player">
+                            <div class="player-avatar">${match.player2 ? '👤' : '?'}</div>
+                            <div class="player-name">${match.player2 || 'Aranıyor'}</div>
+                            <div class="player-bet">${match.player2 ? match.items.length + ' Item' : 'Aranıyor'}</div>
+                            <div class="player-bet">${match.player2 ? (match.side === 'heads' ? 'TAILS' : 'HEADS') : ''}</div>
+                        </div>
+                    </div>
+                    <button class="join-btn" ${isCreator || !canJoin ? 'disabled' : ''}>
+                        ${isCreator ? 'Maçınız' : (match.player2 ? 'Dolu' : 'Katıl')}
+                    </button>
+                    ${isCreator ? '<button class="cancel-btn">Maçı İptal Et</button>' : ''}
+                `;
+                
+                const joinBtn = matchCard.querySelector('.join-btn');
+                if (canJoin) {
+                    joinBtn.addEventListener('click', function() {
+                        joinMatch(match.id);
+                    });
+                }
+                
+                const cancelBtn = matchCard.querySelector('.cancel-btn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', function() {
+                        cancelMatch(match.id);
+                    });
+                }
+                
+                matchesContainer.appendChild(matchCard);
+            });
+        }
+        
+        // Maça katılma
+        function joinMatch(matchId) {
+            const match = activeMatches.find(m => m.id === matchId);
+            if (match && match.player2 === null && match.creator !== currentUser) {
+                // Katılan oyuncunun aynı value'de itemleri olup olmadığını kontrol et
+                const playerTotalValue = userInventory.reduce((total, item) => total + item.value, 0);
+                if (playerTotalValue < match.totalValue) {
+                    alert("Bu maça katılmak için yeterli value'ye sahip değilsiniz!");
+                    return;
+                }
+                
+                // Kullanıcıdan item seçmesini iste
+                showTipModalForMatch(match);
+            }
+        }
+        
+        // Maç için tip modalını göster
+        function showTipModalForMatch(match) {
+            tipItems.innerHTML = '';
+            selectedItemsForTip = [];
+            tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+            totalTipValue.textContent = 'Toplam Value: 0';
+            tipUsername.value = match.creator;
+            tipUsername.disabled = true;
+            
+            confirmTipBtn.textContent = 'Maça Katıl';
+            confirmTipBtn.onclick = function() {
+                confirmJoinMatch(match);
+            };
+            
+            if (userInventory.length === 0) {
+                tipItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            } else {
+                userInventory.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-value">${item.value} Value</div>
+                    `;
+                    
+                    itemElement.addEventListener('click', function() {
+                        // Item zaten seçili mi kontrol et
+                        const existingIndex = selectedItemsForTip.findIndex(selected => selected.id === item.id);
+                        
+                        if (existingIndex !== -1) {
+                            // Item zaten seçili, kaldır
+                            selectedItemsForTip.splice(existingIndex, 1);
+                            itemElement.classList.remove('selected');
+                        } else {
+                            // Item seçili değil, ekle
+                            selectedItemsForTip.push(item);
+                            itemElement.classList.add('selected');
+                        }
+                        
+                        // Seçilen itemleri güncelle
+                        updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
+                    });
+                    
+                    tipItems.appendChild(itemElement);
+                });
+            }
+            
+            tipModal.style.display = 'flex';
+        }
+        
+        // Maça katılma onayı
+        function confirmJoinMatch(match) {
+            const totalValue = selectedItemsForTip.reduce((total, item) => total + item.value, 0);
+            
+            if (totalValue < match.totalValue) {
+                alert("Maça katılmak için en az " + match.totalValue + " Value'ye sahip olmalısınız!");
+                return;
+            }
+            
+            match.player2 = currentUser;
+            match.player2Items = [...selectedItemsForTip];
+            updateMatchesDisplay();
+            addChatMessage("Sistem", `${currentUser} ${match.creator}'ın maçına katıldı!`);
+            
+            // Seçilen itemleri envanterden kaldır
+            selectedItemsForTip.forEach(item => {
+                userInventory = userInventory.filter(invItem => invItem.id !== item.id);
+            });
+            users[currentUser].inventory = userInventory;
+            updateTotalValue();
+            
+            // Modal'ı kapat
+            tipModal.style.display = 'none';
+            
+            // CoinFlip başlat
+            setTimeout(() => {
+                startCoinflip(match);
+            }, 1000);
+        }
+        
+        // Maç iptal etme
+        function cancelMatch(matchId) {
+            const matchIndex = activeMatches.findIndex(m => m.id === matchId);
+            if (matchIndex !== -1 && activeMatches[matchIndex].creator === currentUser) {
+                const match = activeMatches[matchIndex];
+                
+                // Itemleri envantere geri ekle
+                match.items.forEach(item => {
+                    userInventory.push(item);
+                });
+                users[currentUser].inventory = userInventory;
+                updateTotalValue();
+                
+                addChatMessage("Sistem", `${currentUser} maçını iptal etti!`);
+                activeMatches.splice(matchIndex, 1);
+                updateMatchesDisplay();
+            }
+        }
+        
+        // CoinFlip başlatma
+        function startCoinflip(match) {
+            coin.classList.add('flipping');
+            coinflipModal.style.display = 'flex';
+            coinflipResult.textContent = 'Coin dönüyor...';
+            
+            // 3 saniye sonra sonucu belirle
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+                const winningSide = Math.random() > 0.5 ? 'heads' : 'tails';
+                const winner = winningSide === match.side ? match.creator : match.player2;
+                const loser = winner === match.creator ? match.player2 : match.creator;
+                
+                coinflipResult.innerHTML = `
+                    <div>Kazanan Taraf: <span class="winner">${winningSide.toUpperCase()}</span></div>
+                    <div class="winner">Kazanan: ${winner}</div>
+                    <div class="loser">Kaybeden: ${loser}</div>
+                    <div>Kazanç: ${match.pot} Value</div>
+                `;
+                
+                addChatMessage("Sistem", `CoinFlip sonucu: ${winner} ${match.pot} Value kazandı!`);
+                
+                // Kazananın envanterine itemleri ekle
+                if (winner === match.creator) {
+                    // Creator kazandı, kendi itemlerini ve rakip itemlerini alır
+                    match.items.forEach(item => {
+                        if (!users[winner].inventory.some(invItem => invItem.id === item.id)) {
+                            users[winner].inventory.push(item);
+                        }
+                    });
+                    match.player2Items.forEach(item => {
+                        if (!users[winner].inventory.some(invItem => invItem.id === item.id)) {
+                            users[winner].inventory.push(item);
+                        }
+                    });
+                } else {
+                    // Player2 kazandı, rakip itemlerini alır
+                    match.items.forEach(item => {
+                        if (!users[winner].inventory.some(invItem => invItem.id === item.id)) {
+                            users[winner].inventory.push(item);
+                        }
+                    });
+                }
+                
+                // Maçı listeden kaldır
+                activeMatches = activeMatches.filter(m => m.id !== match.id);
+                updateMatchesDisplay();
+            }, 3000);
+        }
+        
+        // Modal kapatma
+        closeModalBtn.addEventListener('click', function() {
+            coinflipModal.style.display = 'none';
+        });
+        
+        // Mesaj gönderme
+        sendMessageBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message && currentUser) {
+                // Tip komutu kontrolü
+                if (message.startsWith('/tip ')) {
+                    const parts = message.split(' ');
+                    if (parts.length >= 3) {
+                        const targetUser = parts[1];
+                        const itemName = parts.slice(2).join(' ');
+                        
+                        // Item bul
+                        const itemToTip = userInventory.find(item => 
+                            item.name.toLowerCase() === itemName.toLowerCase()
+                        );
+                        
+                        if (itemToTip) {
+                            // Tip modalını göster
+                            showTipModal(targetUser, itemToTip);
+                        } else {
+                            addChatMessage("Sistem", "Item bulunamadı veya envanterinizde yok!");
+                        }
+                    } else {
+                        addChatMessage("Sistem", "Kullanım: /tip [kullanıcı] [item]");
+                    }
+                } else {
+                    addChatMessage(currentUser, message);
+                }
+                chatInput.value = '';
+            }
+        }
+        
+        // Tip modalını göster
+        function showTipModal(targetUser, item) {
+            tipItems.innerHTML = '';
+            selectedItemsForTip = [item];
+            tipItemsPreview.innerHTML = '';
+            totalTipValue.textContent = 'Toplam Value: 0';
+            tipUsername.value = targetUser;
+            tipUsername.disabled = false;
+            
+            confirmTipBtn.textContent = 'Gönder';
+            confirmTipBtn.onclick = confirmTip;
+            
+            // Item'i göster
+            userInventory.forEach(invItem => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'inventory-item';
+                if (invItem.id === item.id) {
+                    itemElement.classList.add('selected');
+                }
+                itemElement.innerHTML = `
+                    <div class="item-image">
+                        <img src="${invItem.image}" alt="${invItem.name}">
+                    </div>
+                    <div class="item-name">${invItem.name}</div>
+                    <div class="item-value">${invItem.value} Value</div>
+                `;
+                
+                itemElement.addEventListener('click', function() {
+                    // Sadece bu item seçilebilir
+                    document.querySelectorAll('.inventory-item').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    itemElement.classList.add('selected');
+                    selectedItemsForTip = [invItem];
+                    updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
+                });
+                
+                tipItems.appendChild(itemElement);
+            });
+            
+            updateSelectedItemsPreview(tipItemsPreview, selectedItemsForTip, totalTipValue);
+            tipModal.style.display = 'flex';
+        }
+        
+        // Tip onayı
+        function confirmTip() {
+            const targetUser = tipUsername.value.trim();
+            if (!targetUser) {
+                alert("Lütfen bir kullanıcı adı girin!");
+                return;
+            }
+            
+            if (selectedItemsForTip.length === 0) {
+                alert("Lütfen bir item seçin!");
+                return;
+            }
+            
+            // Hedef kullanıcıyı bul veya oluştur
+            if (!users[targetUser]) {
+                users[targetUser] = {
+                    username: targetUser,
+                    inventory: [],
+                    totalValue: 0
+                };
+            }
+            
+            // Item'i gönder
+            selectedItemsForTip.forEach(item => {
+                // Gönderenin envanterinden kaldır
+                userInventory = userInventory.filter(invItem => invItem.id !== item.id);
+                
+                // Alıcının envanterine ekle
+                if (!users[targetUser].inventory.some(invItem => invItem.id === item.id)) {
+                    users[targetUser].inventory.push(item);
+                }
+            });
+            
+            // Envanteri güncelle
+            users[currentUser].inventory = userInventory;
+            updateTotalValue();
+            
+            addChatMessage("Sistem", `${currentUser}, ${targetUser} kullanıcısına item gönderdi!`);
+            
+            // Modal'ı kapat
+            tipModal.style.display = 'none';
+        }
+        
+        // Tip iptal
+        cancelTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+        });
+        
+        // Tip modal kapatma
+        closeTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+        });
+        
+        function addChatMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = `<span class="sender">${sender}:</span> ${message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Adım değiştirme fonksiyonu
+        function showStep(stepNumber) {
+            // Tüm adımları gizle
+            step1.classList.remove('active');
+            step2.classList.remove('active');
+            
+            // İstenen adımı göster
+            if (stepNumber === 1) {
+                step1.classList.add('active');
+            } else if (stepNumber === 2) {
+                step2.classList.add('active');
+            }
+        }
+        
+        // Hata mesajı gösterme fonksiyonu
+        function showError(errorElement, message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // Hata mesajı gizleme fonksiyonu
+        function hideError(errorElement) {
+            errorElement.style.display = 'none';
+        }
+        
+        // Enter tuşu ile form gönderme
+        usernameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
