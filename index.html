@@ -1392,13 +1392,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             const savedUser = localStorage.getItem('currentUser');
             const savedProfit = localStorage.getItem('totalProfit');
-            const savedMatches = localStorage.getItem('activeMatches');
             
             if (savedUser) {
                 currentUser = savedUser;
                 userInventory = JSON.parse(localStorage.getItem('userInventory')) || [];
                 totalProfit = savedProfit ? parseInt(savedProfit) : 0;
-                activeMatches = savedMatches ? JSON.parse(savedMatches) : [];
                 
                 if (userInventory.length === 0) {
                     userInventory = [...items];
@@ -1453,7 +1451,6 @@
             localStorage.setItem('currentUser', currentUser);
             localStorage.setItem('userInventory', JSON.stringify(userInventory));
             localStorage.setItem('totalProfit', totalProfit.toString());
-            localStorage.setItem('activeMatches', JSON.stringify(activeMatches));
             
             await showMainApp();
         });
@@ -1467,10 +1464,110 @@
             
             updateTotalValue();
             updateProfitDisplay();
-            updateMatchesDisplay();
+            
+            // Real-time bağlantıları başlat
+            await setupRealtimeSubscriptions();
             
             connectionStatus.textContent = '🟢 Çevrimiçi';
             connectionStatus.className = 'connection-status connected';
+        }
+
+        // Real-time bağlantıları kur
+        async function setupRealtimeSubscriptions() {
+            // Chat mesajları için real-time subscription
+            const chatSubscription = supabase
+                .channel('chat-messages')
+                .on('postgres_changes', 
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'messages' 
+                    }, 
+                    (payload) => {
+                        // Yeni mesaj geldiğinde chat'e ekle
+                        addMessageToChat(payload.new);
+                    }
+                )
+                .subscribe();
+
+            // Maçlar için real-time subscription
+            const matchesSubscription = supabase
+                .channel('matches')
+                .on('postgres_changes', 
+                    { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'matches' 
+                    }, 
+                    (payload) => {
+                        // Maç güncellendiğinde veya eklendiğinde listeyi yenile
+                        loadMatchesFromDatabase();
+                    }
+                )
+                .subscribe();
+
+            // Başlangıçta mevcut maçları ve mesajları yükle
+            await loadMatchesFromDatabase();
+            await loadChatMessages();
+        }
+
+        // Maçları veritabanından yükle
+        async function loadMatchesFromDatabase() {
+            try {
+                const { data, error } = await supabase
+                    .from('matches')
+                    .select('*')
+                    .eq('status', 'waiting')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Maçlar yüklenirken hata:', error);
+                    return;
+                }
+
+                activeMatches = data || [];
+                updateMatchesDisplay();
+            } catch (error) {
+                console.error('Maçlar yüklenirken hata:', error);
+            }
+        }
+
+        // Chat mesajlarını veritabanından yükle
+        async function loadChatMessages() {
+            try {
+                const { data, error } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+                    .limit(50);
+
+                if (error) {
+                    console.error('Mesajlar yüklenirken hata:', error);
+                    return;
+                }
+
+                // Mevcut mesajları temizle
+                chatMessages.innerHTML = '';
+                
+                // Mesajları ekrana ekle
+                data.forEach(message => {
+                    addMessageToChat(message);
+                });
+                
+                // En son mesaja kaydır
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (error) {
+                console.error('Mesajlar yüklenirken hata:', error);
+            }
+        }
+
+        // Chat mesajını ekrana ekle
+        function addMessageToChat(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = `<span class="sender">${message.sender}:</span> ${message.content}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         // Chat sistemi
@@ -1481,15 +1578,29 @@
             }
         });
 
-        function sendMessage() {
+        async function sendMessage() {
             const message = chatInput.value.trim();
             if (message && currentUser) {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'chat-message';
-                messageElement.innerHTML = `<span class="sender">${currentUser}:</span> ${message}`;
-                chatMessages.appendChild(messageElement);
-                chatInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                try {
+                    const { data, error } = await supabase
+                        .from('messages')
+                        .insert([
+                            { 
+                                sender: currentUser, 
+                                content: message 
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Mesaj gönderilirken hata:', error);
+                        return;
+                    }
+
+                    // Mesaj başarıyla gönderildi, input'u temizle
+                    chatInput.value = '';
+                } catch (error) {
+                    console.error('Mesaj gönderilirken hata:', error);
+                }
             }
         }
 
@@ -1545,7 +1656,7 @@
                 const matchCard = document.createElement('div');
                 matchCard.className = 'match-card';
                 
-                const totalValue = match.items.reduce((sum, item) => sum + item.value, 0);
+                const totalValue = match.total_value || match.items.reduce((sum, item) => sum + item.value, 0);
                 const isMyMatch = match.creator === currentUser;
                 const isFull = match.player2 !== null;
                 
@@ -1560,7 +1671,7 @@
                             <div class="player-avatar">${match.creator.charAt(0)}</div>
                             <div class="player-bet">${totalValue} Value</div>
                             <div class="player-items">
-                                ${match.items.map(item => `
+                                ${JSON.parse(match.creator_items).map(item => `
                                     <div class="player-item" title="${item.name} - ${item.value} Value">
                                         <img src="${item.image}" alt="${item.name}">
                                         <div class="player-item-value">${item.value}</div>
@@ -1571,10 +1682,10 @@
                         <div class="player">
                             <div class="player-name">${match.player2 || 'Bekleniyor'}</div>
                             <div class="player-avatar">${match.player2 ? match.player2.charAt(0) : '?'}</div>
-                            <div class="player-bet">${match.player2 ? (match.player2_items ? match.player2_items.reduce((sum, item) => sum + item.value, 0) : 0) + ' Value' : ''}</div>
+                            <div class="player-bet">${match.player2 ? (match.player2_items ? JSON.parse(match.player2_items).reduce((sum, item) => sum + item.value, 0) + ' Value' : '') : ''}</div>
                             ${match.player2_items ? `
                             <div class="player-items">
-                                ${match.player2_items.map(item => `
+                                ${JSON.parse(match.player2_items).map(item => `
                                     <div class="player-item" title="${item.name} - ${item.value} Value">
                                         <img src="${item.image}" alt="${item.name}">
                                         <div class="player-item-value">${item.value}</div>
@@ -1604,7 +1715,7 @@
             if (!match) return;
             
             currentMatchId = matchId;
-            currentMatchValue = match.items.reduce((sum, item) => sum + item.value, 0);
+            currentMatchValue = match.total_value || match.items.reduce((sum, item) => sum + item.value, 0);
             selectedItemsForJoin = [];
             selectedSideForJoin = null;
             opponentSide.textContent = match.side.toUpperCase();
@@ -1728,19 +1839,39 @@
         });
 
         // Maça katılma onayı
-        confirmJoinMatchBtn.addEventListener('click', function() {
+        confirmJoinMatchBtn.addEventListener('click', async function() {
             if (selectedItemsForJoin.length > 0 && selectedSideForJoin) {
                 const totalValue = selectedItemsForJoin.reduce((sum, item) => sum + item.value, 0);
                 if (totalValue === currentMatchValue) {
-                    // CoinFlip animasyonunu başlat
-                    startCoinFlipAnimation(currentMatchId, selectedSideForJoin);
-                    joinMatchModal.style.display = 'none';
+                    try {
+                        // Maçı veritabanında güncelle
+                        const { data, error } = await supabase
+                            .from('matches')
+                            .update({
+                                player2: currentUser,
+                                player2_items: JSON.stringify(selectedItemsForJoin),
+                                player2_side: selectedSideForJoin,
+                                status: 'in_progress'
+                            })
+                            .eq('id', currentMatchId);
+
+                        if (error) {
+                            console.error('Maça katılırken hata:', error);
+                            return;
+                        }
+
+                        // CoinFlip animasyonunu başlat
+                        startCoinFlipAnimation(currentMatchId, selectedSideForJoin);
+                        joinMatchModal.style.display = 'none';
+                    } catch (error) {
+                        console.error('Maça katılırken hata:', error);
+                    }
                 }
             }
         });
 
         // CoinFlip animasyonu - %50 şans
-        function startCoinFlipAnimation(matchId, playerSide) {
+        async function startCoinFlipAnimation(matchId, playerSide) {
             const match = activeMatches.find(m => m.id === matchId);
             if (!match) return;
             
@@ -1754,16 +1885,16 @@
             coin.classList.add('flipping');
             coinflipModal.style.display = 'flex';
             
-            setTimeout(() => {
+            setTimeout(async () => {
                 coin.classList.remove('flipping');
                 
                 if (isWinner) {
                     coinflipResult.innerHTML = `<span class="winner">🎉 KAZANDIN! 🎉</span>`;
                     // Kazananın ödülü
-                    const totalWinnings = match.items.reduce((sum, item) => sum + item.value, 0);
+                    const totalWinnings = match.total_value || match.items.reduce((sum, item) => sum + item.value, 0);
                     totalProfit += totalWinnings;
                     // Kazanan itemleri alır
-                    userInventory = [...userInventory, ...match.items];
+                    userInventory = [...userInventory, ...JSON.parse(match.creator_items)];
                     // Kaybeden itemlerini kaybeder (envanterden çıkar)
                     selectedItemsForJoin.forEach(item => {
                         userInventory = userInventory.filter(invItem => invItem.id !== item.id);
@@ -1782,10 +1913,23 @@
                 updateTotalValue();
                 updateProfitDisplay();
                 
-                // Maçı listeden kaldır
-                activeMatches = activeMatches.filter(m => m.id !== matchId);
-                localStorage.setItem('activeMatches', JSON.stringify(activeMatches));
-                updateMatchesDisplay();
+                // Maçı veritabanında tamamlandı olarak işaretle
+                try {
+                    const { data, error } = await supabase
+                        .from('matches')
+                        .update({
+                            status: 'completed',
+                            winner: isWinner ? currentUser : match.creator,
+                            result: winner
+                        })
+                        .eq('id', matchId);
+
+                    if (error) {
+                        console.error('Maç sonucu güncellenirken hata:', error);
+                    }
+                } catch (error) {
+                    console.error('Maç sonucu güncellenirken hata:', error);
+                }
                 
             }, 2000);
         }
@@ -1952,39 +2096,47 @@
             if (selectedItemsForMatch.length > 0 && selectedSideForMatch) {
                 const totalValue = selectedItemsForMatch.reduce((total, item) => total + item.value, 0);
                 
-                // Yeni maç oluştur
-                const newMatch = {
-                    id: Date.now(), // Basit ID oluşturma
-                    creator: currentUser,
-                    player2: null,
-                    items: [...selectedItemsForMatch],
-                    player2_items: null,
-                    side: selectedSideForMatch,
-                    totalValue: totalValue,
-                    pot: totalValue * 2,
-                    status: 'waiting'
-                };
-                
-                activeMatches.push(newMatch);
-                
-                // Seçilen itemleri envanterden kaldır
-                selectedItemsForMatch.forEach(item => {
-                    userInventory = userInventory.filter(invItem => invItem.id !== item.id);
-                });
-                
-                localStorage.setItem('userInventory', JSON.stringify(userInventory));
-                localStorage.setItem('activeMatches', JSON.stringify(activeMatches));
-                updateTotalValue();
-                
-                showSuccessNotification("Maç başarıyla oluşturuldu!");
-                createMatchModal.style.display = 'none';
-                updateMatchesDisplay();
-                
-                // Modal kapandıktan sonra seçimleri sıfırla
-                setTimeout(() => {
-                    selectedItemsForMatch = [];
-                    selectedSideForMatch = null;
-                }, 500);
+                try {
+                    // Yeni maçı veritabanına kaydet
+                    const { data, error } = await supabase
+                        .from('matches')
+                        .insert([
+                            {
+                                creator: currentUser,
+                                player2: null,
+                                creator_items: JSON.stringify(selectedItemsForMatch),
+                                player2_items: null,
+                                side: selectedSideForMatch,
+                                total_value: totalValue,
+                                pot: totalValue * 2,
+                                status: 'waiting'
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Maç oluşturulurken hata:', error);
+                        return;
+                    }
+
+                    // Seçilen itemleri envanterden kaldır
+                    selectedItemsForMatch.forEach(item => {
+                        userInventory = userInventory.filter(invItem => invItem.id !== item.id);
+                    });
+                    
+                    localStorage.setItem('userInventory', JSON.stringify(userInventory));
+                    updateTotalValue();
+                    
+                    showSuccessNotification("Maç başarıyla oluşturuldu!");
+                    createMatchModal.style.display = 'none';
+                    
+                    // Modal kapandıktan sonra seçimleri sıfırla
+                    setTimeout(() => {
+                        selectedItemsForMatch = [];
+                        selectedSideForMatch = null;
+                    }, 500);
+                } catch (error) {
+                    console.error('Maç oluşturulurken hata:', error);
+                }
             }
         });
 
@@ -2014,7 +2166,6 @@
             localStorage.removeItem('currentUser');
             localStorage.removeItem('userInventory');
             localStorage.removeItem('totalProfit');
-            localStorage.removeItem('activeMatches');
             appContainer.style.display = 'none';
             loginContainer.style.display = 'block';
             showStep(1);
