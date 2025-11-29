@@ -1,3 +1,29 @@
+<!-- Supabase Backend Entegrasyonu -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// SUPABASE AYARLARI - BUNLARI KENDİ BİLGİLERİNLE DEĞİŞTİR
+const SUPABASE_URL = 'https://vkuhfhjibegquqatxmyt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrdWhmaGppYmVncXVxYXR4bXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNDEwNzMsImV4cCI6MjA3OTkxNzA3M30.1Ir2Hy43qw6ey59gGytr8Jo3OKUC9y5pt8Jwj76PPPc';
+
+// Supabase bağlantısı
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Real-time dinleyiciler
+supabase
+  .channel('public:chat_messages')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
+    // Yeni mesaj geldiğinde
+    addChatMessage(payload.new.sender, payload.new.message, false);
+  })
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, payload => {
+    // Yeni maç oluşturulduğunda
+    if (!activeMatches.some(m => m.id === payload.new.id)) {
+      activeMatches.push(payload.new);
+      updateMatchesDisplay();
+    }
+  })
+  .subscribe();
+</script>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -2167,3 +2193,4 @@
     </script>
 </body>
 </html>
+
