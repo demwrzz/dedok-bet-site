@@ -928,6 +928,11 @@
         .tip-confirm {
             background: #4CAF50;
         }
+
+        .tip-confirm:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
         
         .tip-cancel {
             background: #f44336;
@@ -1197,7 +1202,7 @@
             </div>
             
             <div class="tip-buttons">
-                <button class="tip-confirm" id="confirmTipBtn">Gönder</button>
+                <button class="tip-confirm" id="confirmTipBtn" disabled>Gönder</button>
                 <button class="tip-cancel" id="cancelTipBtn">İptal</button>
             </div>
         </div>
@@ -1695,6 +1700,189 @@
             }
         }
 
+        // Tip gönderme butonu event listener
+        confirmTipBtn.addEventListener('click', async function() {
+            await sendTip();
+        });
+
+        // İptal butonu
+        cancelTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+            resetTipModal();
+        });
+
+        // Kapat butonu
+        closeTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+            resetTipModal();
+        });
+
+        // Kullanıcı adı input değişikliği
+        tipUsername.addEventListener('input', function() {
+            updateTipButtonState();
+        });
+
+        // Tip gönderme fonksiyonu
+        async function sendTip() {
+            const targetUser = tipUsername.value.trim();
+            
+            if (!targetUser) {
+                alert('Lütfen bir kullanıcı adı girin!');
+                return;
+            }
+            
+            if (selectedItemsForTip.length === 0) {
+                alert('Lütfen en az bir item seçin!');
+                return;
+            }
+            
+            if (targetUser === currentUser) {
+                alert('Kendinize item gönderemezsiniz!');
+                return;
+            }
+            
+            try {
+                // Chat'e tip mesajı gönder
+                const itemNames = selectedItemsForTip.map(item => item.name).join(', ');
+                const totalValue = selectedItemsForTip.reduce((sum, item) => sum + item.value, 0);
+                const message = `${currentUser}, ${targetUser} kullanıcısına toplam ${totalValue} value değerinde item gönderdi: ${itemNames}`;
+                
+                const result = await BackendAPI.sendMessage("Sistem", message);
+                
+                if (result.success) {
+                    // Başarılı mesaj
+                    addChatMessage("Sistem", `${currentUser}, ${targetUser} kullanıcısına ${itemNames} itemlerini gönderdi!`);
+                    
+                    // Modal'ı kapat ve sıfırla
+                    tipModal.style.display = 'none';
+                    resetTipModal();
+                    
+                    alert('Item başarıyla gönderildi!');
+                } else {
+                    alert('Item gönderilirken hata oluştu!');
+                }
+            } catch (error) {
+                console.error('Tip gönderme hatası:', error);
+                alert('Item gönderilirken hata oluştu!');
+            }
+        }
+
+        // Tip modalını sıfırla
+        function resetTipModal() {
+            tipUsername.value = '';
+            selectedItemsForTip = [];
+            updateTipPreview();
+            updateTipButtonState();
+            
+            // Grid'deki seçimleri temizle
+            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        // Tip buton durumunu güncelle
+        function updateTipButtonState() {
+            const hasUsername = tipUsername.value.trim().length > 0;
+            const hasItems = selectedItemsForTip.length > 0;
+            
+            confirmTipBtn.disabled = !(hasUsername && hasItems);
+        }
+
+        // Tüm itemleri yükle (tip için)
+        function loadAllItemsForTip() {
+            allItemsGrid.innerHTML = '';
+            
+            items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'quick-tip-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50/333/fff?text=?'">
+                    <div>${item.name}</div>
+                    <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                `;
+                
+                itemElement.addEventListener('click', () => {
+                    itemElement.classList.toggle('selected');
+                    
+                    if (itemElement.classList.contains('selected')) {
+                        selectedItemsForTip.push(item);
+                    } else {
+                        selectedItemsForTip = selectedItemsForTip.filter(i => i.id !== item.id);
+                    }
+                    
+                    updateTipPreview();
+                    updateTipButtonState();
+                });
+                
+                allItemsGrid.appendChild(itemElement);
+            });
+        }
+
+        // Tip önizlemesini güncelle
+        function updateTipPreview() {
+            tipItemsPreview.innerHTML = '';
+            
+            if (selectedItemsForTip.length === 0) {
+                tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+                totalTipValue.textContent = 'Toplam Value: 0';
+                return;
+            }
+            
+            let totalValue = 0;
+            selectedItemsForTip.forEach(item => {
+                totalValue += item.value;
+                
+                const selectedItem = document.createElement('div');
+                selectedItem.className = 'selected-item';
+                selectedItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/40x40/333/fff?text=?'">
+                    <div class="selected-item-info">
+                        <div>${item.name}</div>
+                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                `;
+                
+                tipItemsPreview.appendChild(selectedItem);
+            });
+            
+            totalTipValue.textContent = `Toplam Value: ${totalValue}`;
+            
+            // Remove butonlarına event listener ekle
+            tipItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    selectedItemsForTip = selectedItemsForTip.filter(item => item.id !== itemId);
+                    updateTipPreview();
+                    updateTipButtonState();
+                    
+                    // Grid'deki seçimi de kaldır
+                    allItemsGrid.querySelectorAll('.quick-tip-item').forEach(gridItem => {
+                        if (gridItem.querySelector('div').textContent === items.find(i => i.id === itemId)?.name) {
+                            gridItem.classList.remove('selected');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Tip modalını göster
+        function showTipModal(targetUser = '', preSelectedItems = []) {
+            tipUsername.value = targetUser;
+            selectedItemsForTip = [...preSelectedItems];
+            updateTipPreview();
+            updateTipButtonState();
+            
+            // Grid'deki seçimleri güncelle
+            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
+                const itemName = item.querySelector('div').textContent;
+                const isSelected = selectedItemsForTip.some(selected => selected.name === itemName);
+                item.classList.toggle('selected', isSelected);
+            });
+            
+            tipModal.style.display = 'flex';
+        }
+
         // Maç oluşturma onayı
         confirmCreateMatchBtn.addEventListener('click', async function() {
             if (selectedItemsForMatch.length > 0 && selectedSideForMatch) {
@@ -1848,97 +2036,6 @@
             // Burada maça katılma işlemini tamamlayacak kod olacak
         }
 
-        // Tüm itemleri yükle (tip için)
-        function loadAllItemsForTip() {
-            allItemsGrid.innerHTML = '';
-            
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'quick-tip-item';
-                itemElement.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}">
-                    <div>${item.name}</div>
-                    <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
-                `;
-                
-                itemElement.addEventListener('click', () => {
-                    itemElement.classList.toggle('selected');
-                    
-                    if (itemElement.classList.contains('selected')) {
-                        selectedItemsForTip.push(item);
-                    } else {
-                        selectedItemsForTip = selectedItemsForTip.filter(i => i.id !== item.id);
-                    }
-                    
-                    updateTipPreview();
-                });
-                
-                allItemsGrid.appendChild(itemElement);
-            });
-        }
-
-        function updateTipPreview() {
-            tipItemsPreview.innerHTML = '';
-            
-            if (selectedItemsForTip.length === 0) {
-                tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
-                totalTipValue.textContent = 'Toplam Value: 0';
-                return;
-            }
-            
-            let totalValue = 0;
-            selectedItemsForTip.forEach(item => {
-                totalValue += item.value;
-                
-                const selectedItem = document.createElement('div');
-                selectedItem.className = 'selected-item';
-                selectedItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}">
-                    <div class="selected-item-info">
-                        <div>${item.name}</div>
-                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
-                    </div>
-                    <button class="remove-item" data-id="${item.id}">×</button>
-                `;
-                
-                tipItemsPreview.appendChild(selectedItem);
-            });
-            
-            totalTipValue.textContent = `Toplam Value: ${totalValue}`;
-            
-            // Remove butonlarına event listener ekle
-            tipItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const itemId = parseInt(this.getAttribute('data-id'));
-                    selectedItemsForTip = selectedItemsForTip.filter(item => item.id !== itemId);
-                    updateTipPreview();
-                    
-                    // Grid'deki seçimi de kaldır
-                    allItemsGrid.querySelectorAll('.quick-tip-item').forEach(gridItem => {
-                        if (gridItem.querySelector('div').textContent === items.find(i => i.id === itemId)?.name) {
-                            gridItem.classList.remove('selected');
-                        }
-                    });
-                });
-            });
-        }
-
-        // Tip modalını göster
-        function showTipModal(targetUser = '', preSelectedItems = []) {
-            tipUsername.value = targetUser;
-            selectedItemsForTip = [...preSelectedItems];
-            updateTipPreview();
-            
-            // Grid'deki seçimleri güncelle
-            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
-                const itemName = item.querySelector('div').textContent;
-                const isSelected = selectedItemsForTip.some(selected => selected.name === itemName);
-                item.classList.toggle('selected', isSelected);
-            });
-            
-            tipModal.style.display = 'flex';
-        }
-
         // Event Listeners
         createMatchBtn.addEventListener('click', function() {
             selectedItemsForMatch = [];
@@ -1950,14 +2047,6 @@
 
         closeCreateMatchBtn.addEventListener('click', function() {
             createMatchModal.style.display = 'none';
-        });
-
-        closeTipBtn.addEventListener('click', function() {
-            tipModal.style.display = 'none';
-        });
-
-        cancelTipBtn.addEventListener('click', function() {
-            tipModal.style.display = 'none';
         });
 
         // Çıkış butonu
