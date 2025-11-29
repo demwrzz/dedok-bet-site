@@ -1,107 +1,11 @@
-<!-- Supabase Backend Entegrasyonu -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-// SUPABASE AYARLARI
-const SUPABASE_URL = 'https://vkuhfhjibegquqatxmyt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrdWhmaGppYmVncXVxYXR4bXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNDEwNzMsImV4cCI6MjA3OTkxNzA3M30.1Ir2Hy43qw6ey59gGytr8Jo3OKUC9y5pt8Jwj76PPPc';
-
-// Supabase bağlantısı
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Supabase Backend Fonksiyonları
-class SupabaseBackend {
-  // Kullanıcı kayıt
-  static async registerUser(username) {
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{ username, inventory: '[]' }])
-      .select();
-    
-    return { success: !error, user: data ? data[0] : null };
-  }
-
-  // Chat mesajı gönder
-  static async sendMessage(sender, message) {
-    const { error } = await supabase
-      .from('chat_messages')
-      .insert([{ sender, message }]);
-    
-    return { success: !error };
-  }
-
-  // Yeni maç oluştur
-  static async createMatch(matchData) {
-    // Items'i JSON formatına çevir
-    const matchToInsert = {
-      ...matchData,
-      items: JSON.stringify(matchData.items),
-      player2_items: matchData.player2_items ? JSON.stringify(matchData.player2_items) : null
-    };
-    
-    const { data, error } = await supabase
-      .from('matchlist')
-      .insert([matchToInsert])
-      .select();
-    
-    return { success: !error, match: data ? data[0] : null };
-  }
-
-  // Tüm maçları getir
-  static async getMatches() {
-    const { data, error } = await supabase
-      .from('matchlist')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Maçlar yüklenirken hata:', error);
-      return [];
-    }
-    
-    // JSON verilerini parse et
-    return data.map(match => ({
-      ...match,
-      items: match.items ? JSON.parse(match.items) : [],
-      player2_items: match.player2_items ? JSON.parse(match.player2_items) : null
-    }));
-  }
-
-  // Maça katıl
-  static async joinMatch(matchId, playerData) {
-    const { error } = await supabase
-      .from('matchlist')
-      .update({ 
-        player2: playerData.username,
-        player2_items: JSON.stringify(playerData.items),
-        status: 'active'
-      })
-      .eq('id', matchId);
-    
-    return { success: !error };
-  }
-
-  // Tüm chat mesajlarını getir
-  static async getChatMessages() {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .order('created_at', { ascending: true })
-      .limit(50);
-    
-    return error ? [] : data;
-  }
-}
-
-// Eski BackendAPI yerine bunu kullan
-const BackendAPI = SupabaseBackend;
-</script>
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dedok Bet - CoinFlip</title>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -1300,6 +1204,100 @@ const BackendAPI = SupabaseBackend;
     </div>
 
     <script>
+        // SUPABASE AYARLARI
+        const SUPABASE_URL = 'https://vkuhfhjibegquqatxmyt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrdWhmaGppYmVncXVxYXR4bXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNDEwNzMsImV4cCI6MjA3OTkxNzA3M30.1Ir2Hy43qw6ey59gGytr8Jo3OKUC9y5pt8Jwj76PPPc';
+
+        // Supabase bağlantısı
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Supabase Backend Fonksiyonları
+        class SupabaseBackend {
+            // Kullanıcı kayıt
+            static async registerUser(username) {
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([{ username, inventory: '[]' }])
+                    .select();
+                
+                return { success: !error, user: data ? data[0] : null };
+            }
+
+            // Chat mesajı gönder
+            static async sendMessage(sender, message) {
+                const { error } = await supabase
+                    .from('chat_messages')
+                    .insert([{ sender, message }]);
+                
+                return { success: !error };
+            }
+
+            // Yeni maç oluştur
+            static async createMatch(matchData) {
+                // Items'i JSON formatına çevir
+                const matchToInsert = {
+                    ...matchData,
+                    items: JSON.stringify(matchData.items),
+                    player2_items: matchData.player2_items ? JSON.stringify(matchData.player2_items) : null
+                };
+                
+                const { data, error } = await supabase
+                    .from('matchlist')
+                    .insert([matchToInsert])
+                    .select();
+                
+                return { success: !error, match: data ? data[0] : null };
+            }
+
+            // Tüm maçları getir
+            static async getMatches() {
+                const { data, error } = await supabase
+                    .from('matchlist')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Maçlar yüklenirken hata:', error);
+                    return [];
+                }
+                
+                // JSON verilerini parse et
+                return data.map(match => ({
+                    ...match,
+                    items: match.items ? JSON.parse(match.items) : [],
+                    player2_items: match.player2_items ? JSON.parse(match.player2_items) : null
+                }));
+            }
+
+            // Maça katıl
+            static async joinMatch(matchId, playerData) {
+                const { error } = await supabase
+                    .from('matchlist')
+                    .update({ 
+                        player2: playerData.username,
+                        player2_items: JSON.stringify(playerData.items),
+                        status: 'active'
+                    })
+                    .eq('id', matchId);
+                
+                return { success: !error };
+            }
+
+            // Tüm chat mesajlarını getir
+            static async getChatMessages() {
+                const { data, error } = await supabase
+                    .from('chat_messages')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+                    .limit(50);
+                
+                return error ? [] : data;
+            }
+        }
+
+        // Eski BackendAPI yerine bunu kullan
+        const BackendAPI = SupabaseBackend;
+
         // DOM Elementleri
         const loginContainer = document.getElementById('loginContainer');
         const appContainer = document.getElementById('appContainer');
@@ -1356,7 +1354,6 @@ const BackendAPI = SupabaseBackend;
         let currentUser = null;
         let verificationCode = '';
         let activeMatches = [];
-        let matchIdCounter = 1;
         let userInventory = [];
         let selectedItemForWithdraw = null;
         let selectedItemsForMatch = [];
@@ -1704,7 +1701,6 @@ const BackendAPI = SupabaseBackend;
                 const totalValue = selectedItemsForMatch.reduce((total, item) => total + item.value, 0);
                 
                 const newMatch = {
-                    id: "CF-" + Date.now(), // Benzersiz ID
                     creator: currentUser,
                     player2: null,
                     items: [...selectedItemsForMatch],
@@ -1736,12 +1732,408 @@ const BackendAPI = SupabaseBackend;
             }
         });
 
-        // Diğer fonksiyonlar aynen kalacak...
-        // (showInventory, loadAllItemsForTip, updateMatchesDisplay, vs.)
+        // Yardımcı Fonksiyonlar
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step' + stepNumber).classList.add('active');
+        }
 
-        // Geri kalan JavaScript kodları aynen devam edecek...
-        // ...
+        function showError(errorElement, message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
 
+        function hideError(errorElement) {
+            errorElement.style.display = 'none';
+        }
+
+        function updateTotalValue() {
+            const total = userInventory.reduce((sum, item) => sum + item.value, 0);
+            userBalance.textContent = total + ' Value';
+        }
+
+        // Maçları güncelle
+        function updateMatchesDisplay() {
+            matchesContainer.innerHTML = '';
+            
+            if (activeMatches.length === 0) {
+                noMatchesMessage.style.display = 'block';
+                return;
+            }
+            
+            noMatchesMessage.style.display = 'none';
+            
+            activeMatches.forEach(match => {
+                const matchCard = document.createElement('div');
+                matchCard.className = 'match-card';
+                
+                const totalValue = match.items.reduce((sum, item) => sum + item.value, 0);
+                
+                matchCard.innerHTML = `
+                    <div class="match-header">
+                        <div class="match-id">${match.id}</div>
+                        <div class="match-pot">${totalValue * 2} Value</div>
+                    </div>
+                    <div class="players">
+                        <div class="player">
+                            <div class="player-name">${match.creator}</div>
+                            <div class="player-avatar">${match.creator.charAt(0)}</div>
+                            <div class="player-bet">${totalValue} Value</div>
+                        </div>
+                        <div class="player">
+                            <div class="player-name">${match.player2 || 'Bekleniyor'}</div>
+                            <div class="player-avatar">${match.player2 ? match.player2.charAt(0) : '?'}</div>
+                            <div class="player-bet">${match.player2 ? (match.player2_items ? match.player2_items.reduce((sum, item) => sum + item.value, 0) : 0) + ' Value' : ''}</div>
+                        </div>
+                    </div>
+                    <button class="join-btn" ${match.creator === currentUser || match.player2 ? 'disabled' : ''}>
+                        ${match.creator === currentUser ? 'Sizin Maçınız' : (match.player2 ? 'Maç Dolu' : 'Katıl')}
+                    </button>
+                `;
+                
+                const joinBtn = matchCard.querySelector('.join-btn');
+                if (!joinBtn.disabled) {
+                    joinBtn.addEventListener('click', () => joinMatch(match.id));
+                }
+                
+                matchesContainer.appendChild(matchCard);
+            });
+        }
+
+        // Maça katıl
+        async function joinMatch(matchId) {
+            const match = activeMatches.find(m => m.id === matchId);
+            if (!match) return;
+            
+            // Kullanıcının envanterini göster
+            showInventoryForMatch(matchId);
+        }
+
+        // Envanteri göster (maç için)
+        function showInventoryForMatch(matchId) {
+            inventoryItems.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                inventoryItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+                return;
+            }
+            
+            userInventory.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'inventory-item';
+                itemElement.innerHTML = `
+                    <div class="item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-value">${item.value} Value</div>
+                `;
+                
+                itemElement.addEventListener('click', () => {
+                    // Item seçimi burada yapılacak
+                    selectItemForMatch(item, matchId);
+                });
+                
+                inventoryItems.appendChild(itemElement);
+            });
+            
+            inventoryModal.style.display = 'flex';
+        }
+
+        function selectItemForMatch(item, matchId) {
+            // Bu fonksiyon maça katılmak için item seçimini yönetecek
+            console.log('Item selected for match:', item, matchId);
+            // Burada maça katılma işlemini tamamlayacak kod olacak
+        }
+
+        // Tüm itemleri yükle (tip için)
+        function loadAllItemsForTip() {
+            allItemsGrid.innerHTML = '';
+            
+            items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'quick-tip-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div>${item.name}</div>
+                    <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                `;
+                
+                itemElement.addEventListener('click', () => {
+                    itemElement.classList.toggle('selected');
+                    
+                    if (itemElement.classList.contains('selected')) {
+                        selectedItemsForTip.push(item);
+                    } else {
+                        selectedItemsForTip = selectedItemsForTip.filter(i => i.id !== item.id);
+                    }
+                    
+                    updateTipPreview();
+                });
+                
+                allItemsGrid.appendChild(itemElement);
+            });
+        }
+
+        function updateTipPreview() {
+            tipItemsPreview.innerHTML = '';
+            
+            if (selectedItemsForTip.length === 0) {
+                tipItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+                totalTipValue.textContent = 'Toplam Value: 0';
+                return;
+            }
+            
+            let totalValue = 0;
+            selectedItemsForTip.forEach(item => {
+                totalValue += item.value;
+                
+                const selectedItem = document.createElement('div');
+                selectedItem.className = 'selected-item';
+                selectedItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="selected-item-info">
+                        <div>${item.name}</div>
+                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                `;
+                
+                tipItemsPreview.appendChild(selectedItem);
+            });
+            
+            totalTipValue.textContent = `Toplam Value: ${totalValue}`;
+            
+            // Remove butonlarına event listener ekle
+            tipItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    selectedItemsForTip = selectedItemsForTip.filter(item => item.id !== itemId);
+                    updateTipPreview();
+                    
+                    // Grid'deki seçimi de kaldır
+                    allItemsGrid.querySelectorAll('.quick-tip-item').forEach(gridItem => {
+                        if (gridItem.querySelector('div').textContent === items.find(i => i.id === itemId)?.name) {
+                            gridItem.classList.remove('selected');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Tip modalını göster
+        function showTipModal(targetUser = '', preSelectedItems = []) {
+            tipUsername.value = targetUser;
+            selectedItemsForTip = [...preSelectedItems];
+            updateTipPreview();
+            
+            // Grid'deki seçimleri güncelle
+            allItemsGrid.querySelectorAll('.quick-tip-item').forEach(item => {
+                const itemName = item.querySelector('div').textContent;
+                const isSelected = selectedItemsForTip.some(selected => selected.name === itemName);
+                item.classList.toggle('selected', isSelected);
+            });
+            
+            tipModal.style.display = 'flex';
+        }
+
+        // Event Listeners
+        createMatchBtn.addEventListener('click', function() {
+            selectedItemsForMatch = [];
+            selectedSideForMatch = null;
+            updateCreateMatchPreview();
+            loadInventoryForMatchCreation();
+            createMatchModal.style.display = 'flex';
+        });
+
+        closeCreateMatchBtn.addEventListener('click', function() {
+            createMatchModal.style.display = 'none';
+        });
+
+        closeTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+        });
+
+        cancelTipBtn.addEventListener('click', function() {
+            tipModal.style.display = 'none';
+        });
+
+        // Çıkış butonu
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userInventory');
+            appContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            showStep(1);
+            usernameInput.value = '';
+            termsCheckbox.checked = false;
+            activeMatches = [];
+            currentUser = null;
+            userInventory = [];
+            updateTotalValue();
+        });
+
+        // Diğer fonksiyonlar
+        function loadInventoryForMatchCreation() {
+            createMatchItems.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                createMatchItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+                return;
+            }
+            
+            userInventory.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'inventory-item';
+                itemElement.innerHTML = `
+                    <div class="item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-value">${item.value} Value</div>
+                `;
+                
+                itemElement.addEventListener('click', () => {
+                    // Item seçimi
+                    const isSelected = selectedItemsForMatch.some(selected => selected.id === item.id);
+                    if (isSelected) {
+                        selectedItemsForMatch = selectedItemsForMatch.filter(selected => selected.id !== item.id);
+                        itemElement.classList.remove('selected');
+                    } else {
+                        selectedItemsForMatch.push(item);
+                        itemElement.classList.add('selected');
+                    }
+                    updateCreateMatchPreview();
+                });
+                
+                createMatchItems.appendChild(itemElement);
+            });
+        }
+
+        function updateCreateMatchPreview() {
+            selectedItemsPreview.innerHTML = '';
+            
+            if (selectedItemsForMatch.length === 0) {
+                selectedItemsPreview.innerHTML = '<div class="no-item-selected">Henüz item seçilmedi</div>';
+                totalMatchValue.textContent = 'Toplam Value: 0';
+                confirmCreateMatchBtn.disabled = true;
+                return;
+            }
+            
+            let totalValue = 0;
+            selectedItemsForMatch.forEach(item => {
+                totalValue += item.value;
+                
+                const selectedItem = document.createElement('div');
+                selectedItem.className = 'selected-item';
+                selectedItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="selected-item-info">
+                        <div>${item.name}</div>
+                        <div style="color: #4CAF50; font-size: 12px;">${item.value} Value</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                `;
+                
+                selectedItemsPreview.appendChild(selectedItem);
+            });
+            
+            totalMatchValue.textContent = `Toplam Value: ${totalValue}`;
+            confirmCreateMatchBtn.disabled = !selectedSideForMatch;
+            
+            // Remove butonlarına event listener ekle
+            selectedItemsPreview.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    selectedItemsForMatch = selectedItemsForMatch.filter(item => item.id !== itemId);
+                    updateCreateMatchPreview();
+                    
+                    // Grid'deki seçimi de kaldır
+                    createMatchItems.querySelectorAll('.inventory-item').forEach(invItem => {
+                        if (invItem.querySelector('.item-name').textContent === items.find(i => i.id === itemId)?.name) {
+                            invItem.classList.remove('selected');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Side seçimi
+        document.querySelectorAll('.side-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedSideForMatch = this.getAttribute('data-side');
+                confirmCreateMatchBtn.disabled = selectedItemsForMatch.length === 0;
+            });
+        });
+
+        // Wallet butonu
+        walletBtn.addEventListener('click', function() {
+            showInventory();
+        });
+
+        function showInventory() {
+            inventoryItems.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                inventoryItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #aaa;">Envanteriniz boş</div>';
+            } else {
+                userInventory.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-value">${item.value} Value</div>
+                    `;
+                    
+                    itemElement.addEventListener('click', () => {
+                        showWithdrawModal(item);
+                    });
+                    
+                    inventoryItems.appendChild(itemElement);
+                });
+            }
+            
+            inventoryModal.style.display = 'flex';
+        }
+
+        function showWithdrawModal(item) {
+            selectedItemForWithdraw = item;
+            withdrawItemInfo.innerHTML = `
+                <div class="withdraw-item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="withdraw-item-info">
+                    <div style="font-weight: bold;">${item.name}</div>
+                    <div style="color: #4CAF50;">${item.value} Value</div>
+                </div>
+            `;
+            withdrawModal.style.display = 'flex';
+        }
+
+        closeInventoryBtn.addEventListener('click', function() {
+            inventoryModal.style.display = 'none';
+        });
+
+        confirmWithdrawBtn.addEventListener('click', function() {
+            // Withdraw işlemi - şu anda yapım aşamasında
+            alert('Withdraw işlemi şu anda yapım aşamasında. Discord üzerinden moderatörle iletişime geçin.');
+            withdrawModal.style.display = 'none';
+            inventoryModal.style.display = 'none';
+        });
+
+        cancelWithdrawBtn.addEventListener('click', function() {
+            withdrawModal.style.display = 'none';
+        });
+
+        // İlk yükleme
+        updateTotalValue();
     </script>
 </body>
 </html>
